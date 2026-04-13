@@ -11,7 +11,7 @@ from .models import (
 from .forms import (
     CommissionForm
 )
-from accounts.mixins import RoleRequiredMixin 
+from accounts.mixins import RoleRequiredMixin
 from .services import CommissionService
 
 LOGIN_URL = '/accounts/login/'
@@ -37,7 +37,9 @@ class RequestDetailView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # PK is available in self.kwargs from the URL pattern
-        context['request'] = CommissionService.get_commission(self.kwargs.get('pk'))
+        context['request'] = CommissionService.get_commission(
+            self.kwargs.get('pk')
+        )
         return context
 
 
@@ -52,7 +54,7 @@ class RequestCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
             self.object = CommissionService.create_commission(
                 author=self.request.user.profile,
                 data=form.cleaned_data,
-                jobs_data=[] # TO-DO: Implement the creation of Jobs.
+                jobs_data=[]  # TO-DO: Implement the creation of Jobs.
             )
 
             return redirect(self.object)
@@ -70,14 +72,14 @@ class RequestUpdateView(LoginRequiredMixin, RoleRequiredMixin, UpdateView):
     def form_valid(self, form):
         try:
             instance = self.get_object()
-            
+
             # TO-DO: Implement the updating of Commissions & Jobs.
             # self.object = CommissionService.update_commission(
             #     instance=instance,
             #     data=form.cleaned_data,
             #     jobs_data=[]
             # )
-            
+
             return redirect(self.object)
         except Exception as e:
             form.add_error(None, f"Update Error: {e}")
