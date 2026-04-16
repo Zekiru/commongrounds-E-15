@@ -35,7 +35,8 @@
             >Edit Profile</a>
             {% endif %}
 
-            <form method="POST" action="{% url 'logout' %}">
+            <form method="POST" action="{% url 'logout' %}"
+            class="form-btn">
                 {% csrf_token %}
                 <button type="submit"
                 class="logout-btn">Logout</button>
