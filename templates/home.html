@@ -4,17 +4,6 @@
 
 {% block content %}
     <h2>Directory</h2>
-    {% if user.is_authenticated %}
-        <div class="user-info">
-            <p>Welcome, <strong>{{ user.profile.display_name|default:user.username }}</strong></p>
-            <p>Role: {{ user.profile.get_role_display }}</p>
-            <a href="{% url 'update' user.username %}" class="edit-link">
-                Edit Profile
-            </a>
-        </div>
-    {% else %}
-        <p><a href="{% url 'login' %}">Log in</a> to manage your profile.</p>
-    {% endif %}
     <div class="list-wrapper">
         <div class="list-item">
             <a href="/merchstore/items"
