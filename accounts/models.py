@@ -9,18 +9,18 @@ class Profile(models.Model):
     display_name = models.CharField(max_length=63)
     email_address = models.EmailField()
     ROLES = [
-           ("A", "Anonymous"),
-           ("MS", "Market Seller"),
-           ("EO", "Event Organizer"),
-           ("BC", "Book Contributor"),
-           ("PC", "Project Creator"),
-           ("CM", "Commission Maker"),
+        ("A", "Anonymous"),
+        ("MS", "Market Seller"),
+        ("EO", "Event Organizer"),
+        ("BC", "Book Contributor"),
+        ("PC", "Project Creator"),
+        ("CM", "Commission Maker"),
     ]
     role = models.CharField(max_length=20, choices=ROLES, default="A")
-    
+
     def __str__(self):
         return self.display_name
-    
+
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):
         if created:
