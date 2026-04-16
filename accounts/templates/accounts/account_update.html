@@ -3,10 +3,12 @@
 {% block title %}Account Update{% endblock %}
 
 {% block content %}
-    <h2>Update Your Account</h2>
-    <form method="POST">
-        {% csrf_token %}
-        {{form.as_p}}
-        <button type = "submit">Save Changes</button>
-    </form>
+    <div class="form-wrapper">
+        <h2>Update Your Account</h2>
+        <form class="form-group" method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
 {% endblock %}
