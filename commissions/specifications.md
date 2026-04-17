@@ -4,42 +4,42 @@
 - [x] app_name: commissions
 
 ## Models
-- [ ] CommissionType
-    - [ ] Name - max length is 255 character
-    - [ ] Description - text field
-    - [ ] Types should be sorted by name in ascending order
+- [x] CommissionType
+    - [x] Name - max length is 255 character
+    - [x] Description - text field
+    - [x] Types should be sorted by name in ascending order
 
-- [ ] Commission
-    - [ ] Title - max length is 255 characters
-    - [ ] Description - text field 
-    - [ ] Type - foreign key to CommissionType, set to NULL when deleted
-    - [ ] Maker - foreign key to Profile, model deletion is cascaded
-    - [ ] People Required - should be whole number
-    - [ ] Status - character field with the following options:
+- [x] Commission
+    - [x] Title - max length is 255 characters
+    - [x] Description - text field 
+    - [x] Type - foreign key to CommissionType, set to NULL when deleted
+    - [x] Maker - foreign key to Profile, model deletion is cascaded
+    - [x] People Required - should be whole number
+    - [x] Status - character field with the following options:
         - Open (default)
         - Full
-    - [ ] Created On - datetime field, only gets set when the model is created
-    - [ ] Updated On - datetime field, always updates on last model update
-    - [ ] Commissions should be sorted by the date it was created, in ascending order
+    - [x] Created On - datetime field, only gets set when the model is created
+    - [x] Updated On - datetime field, always updates on last model update
+    - [x] Commissions should be sorted by the date it was created, in ascending order
 
-- [ ] Job
-    - [ ] Commission - foreign key to Commission, model deletion is cascaded
-    - [ ] Role - max length is 255 characters
-    - [ ] Manpower Required - should be whole number
-    - [ ] Status - character field with the following options:
+- [x] Job
+    - [x] Commission - foreign key to Commission, model deletion is cascaded
+    - [x] Role - max length is 255 characters
+    - [x] Manpower Required - should be whole number
+    - [x] Status - character field with the following options:
         - Open (default)
         - Full
-    - [ ] Jobs should be sorted by status (Open > Full), manpower required, in descending order, then role, in ascending order
+    - [x] Jobs should be sorted by status (Open > Full), manpower required, in descending order, then role, in ascending order
 
-- [ ] JobApplication
-    - [ ] Job - foreign key to Job, model deletion is cascaded
-    - [ ] Applicant - foreign key to Profile, model deletion is cascaded
-    - [ ] Status - character field with the following options:
+- [x] JobApplication
+    - [x] Job - foreign key to Job, model deletion is cascaded
+    - [x] Applicant - foreign key to Profile, model deletion is cascaded
+    - [x] Status - character field with the following options:
         - Pending (default)
         - Accepted
         - Rejected
-    - [ ] Applied On - datetime field, only gets set when the model is created
-    - [ ] Should be sorted by status (Pending first, then Accepted, then Rejected), then Applied On, in descending order
+    - [x] Applied On - datetime field, only gets set when the model is created
+    - [x] Should be sorted by status (Pending first, then Accepted, then Rejected), then Applied On, in descending order
 
 ## Views
 - [ ] List View

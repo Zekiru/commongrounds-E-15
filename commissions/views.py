@@ -1,6 +1,6 @@
 from django.shortcuts import redirect
 from django.views.generic import TemplateView
-from .models import CommissionType, Commission
+from .models import Commission
 
 
 def index(request):

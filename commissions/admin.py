@@ -18,8 +18,8 @@ class CommissionAdmin(admin.ModelAdmin):
     model = Commission
     list_display = [
         'title',
-        'commission_type',
-        'description',
+        'type',
+        'maker',
         'people_required',
         'created_on',
         'updated_on'

@@ -8,7 +8,7 @@
     {% for request in requests %}
         <div class="list-item">
             <h3>{{ request.title }}</h3>
-            <p><i>{{ request.commission_type }}</i></p>
+            <p><i>{{ request.type }}</i></p>
             <a href="{{ request.get_absolute_url }}"
             class="btn align-left">
                 View Request
