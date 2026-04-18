@@ -71,13 +71,13 @@
     - [ ] When all the commission’s jobs’ statuses are “Full”, the commission’s status should be set to “Full”.
 
 ## Advanced Requirements
-- [ ] Create a CommissionService class in *commissions/services.py*. Views must not contain business logic directly — all coordination between models must go through this service. It must implement the following methods:
-    - [ ] *create_commission(author, data, jobs_data)* — creates the Commission and all associated Job entries atomically
-    - [ ] *apply_to_job(applicant, job)* — creates a JobApplication, checking that the applicant has not already applied and that the job is not full
-    - [ ] *sync_commission_status(commission)* — checks all related Jobs and sets the commission status to "Full" if all jobs are full; called on every Commission update
-    - [ ] *get_commission_summary(commission)* — returns a dictionary with total_manpower and open_manpower computed from all related Jobs and their accepted applications
+- [x] Create a CommissionService class in *commissions/services.py*. Views must not contain business logic directly — all coordination between models must go through this service. It must implement the following methods:
+    - [x] *create_commission(author, data, jobs_data)* — creates the Commission and all associated Job entries atomically
+    - [x] *apply_to_job(applicant, job)* — creates a JobApplication, checking that the applicant has not already applied and that the job is not full
+    - [x] *sync_commission_status(commission)* — checks all related Jobs and sets the commission status to "Full" if all jobs are full; called on every Commission update
+    - [x] *get_commission_summary(commission)* — returns a dictionary with total_manpower and open_manpower computed from all related Jobs and their accepted applications
 
 - [ ] All four methods must be used in the appropriate views or signals.
 
-- [ ] *create_commission* must use *transaction.atomic()* to ensure the Commission and its Jobs are created together or not at all.
+- [x] *create_commission* must use *transaction.atomic()* to ensure the Commission and its Jobs are created together or not at all.
 
