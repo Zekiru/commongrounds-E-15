@@ -1,6 +1,6 @@
 from django.shortcuts import redirect
 from django.views.generic import TemplateView
-from .models import Commission
+from .services import CommissionService
 
 
 def index(request):
@@ -8,24 +8,40 @@ def index(request):
 
 
 class RequestListView(TemplateView):
-    model = Commission
     template_name = 'commissions/request_list.html'
     context_object_name = 'request_list'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['requests'] = Commission.objects.all()
+
+        try:
+            context['requests'] = CommissionService.get_all_commissions()
+        except Exception as e:
+            print(f"Service Error: {str(e)}")
+
         return context
 
 
 class RequestDetailView(TemplateView):
-    model = Commission
     template_name = 'commissions/request_detail.html'
     context_object_name = 'request_detail'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['request'] = Commission.objects.get(
-            id=self.kwargs['pk']
-        )
+
+        try:
+            context['request'] = CommissionService.get_commission(
+                self.kwargs['pk']
+            )
+        except Exception as e:
+            print(f"Service Error: {str(e)}")
+
         return context
+
+
+# TO-DO: Add views for creating and updating requests
+
+# class RequestCreateView(TemplateView):
+
+
+# class RequestUpdateView(TemplateView):
