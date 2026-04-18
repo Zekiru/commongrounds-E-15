@@ -34,9 +34,15 @@ class CommissionService:
 
     @staticmethod
     def apply_to_job(applicant, job):
-        if JobApplication.objects.filter(
-            applicant=applicant, job=job
-        ).exists() or job.status == 1:
+        invalid_conditions = [
+            JobApplication.objects.filter(
+                applicant=applicant, job=job
+            ).exists(),
+            job.commission.status != 0,
+            job.status != 0
+        ]
+
+        if any(invalid_conditions):
             return False
 
         JobApplication.objects.create(
