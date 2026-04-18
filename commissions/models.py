@@ -3,9 +3,14 @@ from django.urls import reverse
 
 from accounts.models import Profile
 
-STATUSES = [
-    (0, "Open"),
-    (1, "Full"),
+VACANCY_STATUS = [
+    (0, 'Open'),
+    (1, 'Full'),
+]
+APPLICATION_STATUS = [
+    (0, 'Pending'),
+    (1, 'Accepted'),
+    (2, 'Rejected'),
 ]
 
 
@@ -17,7 +22,7 @@ class CommissionType(models.Model):
         return self.name
 
     class Meta:
-        ordering = ["name"]
+        ordering = ['name']
         verbose_name = 'commission type'
         verbose_name_plural = 'commission types'
 
@@ -38,7 +43,7 @@ class Commission(models.Model):
     )
     people_required = models.IntegerField()
     status = models.IntegerField(
-        choices=STATUSES,
+        choices=VACANCY_STATUS,
         default=0
     )
     created_on = models.DateTimeField(auto_now_add=True)
@@ -51,7 +56,7 @@ class Commission(models.Model):
         return reverse('request_detail', args=[str(self.id)])
 
     class Meta:
-        ordering = ["created_on"]
+        ordering = ['created_on']
         verbose_name = 'commission'
         verbose_name_plural = 'commissions'
 
@@ -65,9 +70,12 @@ class Job(models.Model):
     role = models.CharField(max_length=255)
     manpower_required = models.IntegerField()
     status = models.IntegerField(
-        choices=STATUSES,
+        choices=VACANCY_STATUS,
         default=0
     )
+
+    def __str__(self):
+        return f"{self.role} Role in {self.commission} Commission"
 
     class Meta:
         ordering = [
@@ -80,11 +88,6 @@ class Job(models.Model):
 
 
 class JobApplication(models.Model):
-    STATUSES = [
-        (0, "Pending"),
-        (1, "Accepted"),
-        (2, "Rejected"),
-    ]
     job = models.ForeignKey(
         Job,
         on_delete=models.CASCADE,
@@ -96,10 +99,13 @@ class JobApplication(models.Model):
         related_name='applications'
     )
     status = models.IntegerField(
-        choices=STATUSES,
+        choices=APPLICATION_STATUS,
         default=0
     )
     applied_on = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.job.role} Application of {self.applicant}"
 
     class Meta:
         ordering = [
