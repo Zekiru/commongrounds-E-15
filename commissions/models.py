@@ -3,9 +3,13 @@ from django.urls import reverse
 
 from accounts.models import Profile
 
-VACANCY_STATUS = [
+JOB_STATUS = [
     (0, 'Open'),
     (1, 'Full'),
+]
+COMMISSION_STATUS = JOB_STATUS + [
+    (2, 'Completed'),
+    (3, 'Discontinued')
 ]
 APPLICATION_STATUS = [
     (0, 'Pending'),
@@ -43,7 +47,7 @@ class Commission(models.Model):
     )
     people_required = models.IntegerField()
     status = models.IntegerField(
-        choices=VACANCY_STATUS,
+        choices=COMMISSION_STATUS,
         default=0
     )
     created_on = models.DateTimeField(auto_now_add=True)
@@ -70,7 +74,7 @@ class Job(models.Model):
     role = models.CharField(max_length=255)
     manpower_required = models.IntegerField()
     status = models.IntegerField(
-        choices=VACANCY_STATUS,
+        choices=JOB_STATUS,
         default=0
     )
 
