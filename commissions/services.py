@@ -54,6 +54,9 @@ class CommissionService:
 
     @staticmethod
     def sync_commission_status(commission):
+        if commission.status > 1:
+            return
+
         has_job_openings = commission.jobs.filter(status=0).exists()
 
         new_status = 0 if has_job_openings else 1
