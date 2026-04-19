@@ -1,16 +1,19 @@
-from django.shortcuts import redirect
-from django.http import Http404
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.core.exceptions import PermissionDenied
 
 
-class RoleRequiredMixin():
+class RoleRequiredMixin(UserPassesTestMixin):
     required_role = None
 
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect('login')
-        if not hasattr(request.user, 'profile'):
-            return redirect('login')
-        if request.user.profile.role != self.required_role:
-            raise Http404('You do not have permission to view this page.')
+    def test_func(self):
+        user = self.request.user
+        return (
+            user.is_authenticated and
+            hasattr(user, 'profile') and
+            user.profile.role == self.required_role
+        )
 
-        return super().dispatch(request, *args, **kwargs)
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            raise PermissionDenied
+        return super().handle_no_permission()
