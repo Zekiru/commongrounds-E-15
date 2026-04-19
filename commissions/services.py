@@ -1,7 +1,12 @@
 from django.db import transaction
 from django.db.models import Sum, Q
 from django.db.models.functions import Coalesce
-from .models import Commission, Job, JobApplication
+
+from .models import (
+    Commission,
+    Job,
+    JobApplication
+)
 
 
 class CommissionService:
@@ -11,7 +16,10 @@ class CommissionService:
 
     @staticmethod
     def get_commission(pk):
-        return Commission.objects.get(id=pk)
+        try:
+            return Commission.objects.get(pk=pk)
+        except Commission.DoesNotExist:
+            return None
 
     @staticmethod
     @transaction.atomic
@@ -68,7 +76,7 @@ class CommissionService:
     @staticmethod
     def get_commission_summary(commission):
         return {
-            'id': commission.id,
+            'pk': commission.pk,
             'title': commission.title,
             'type': commission.type.name if commission.type else None,
             'maker': commission.maker.user.username,
