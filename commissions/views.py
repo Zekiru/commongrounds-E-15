@@ -14,8 +14,6 @@ from .forms import (
 from accounts.mixins import RoleRequiredMixin
 from .services import CommissionService
 
-LOGIN_URL = '/accounts/login/'
-
 
 def index(request):
     return redirect('requests/')
@@ -26,8 +24,8 @@ class RequestListView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Directly assign the list from your service
-        context['requests'] = CommissionService.get_all_commissions()
+        service = CommissionService(user=self.request.user)
+        context['requests'] = service.get_all_commissions()
         return context
 
 
@@ -36,8 +34,8 @@ class RequestDetailView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # PK is available in self.kwargs from the URL pattern
-        context['request'] = CommissionService.get_commission(
+        service = CommissionService(user=self.request.user)
+        context['request'] = service.get_commission(
             self.kwargs.get('pk')
         )
         return context
@@ -49,12 +47,28 @@ class RequestCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
     form_class = CommissionForm
     template_name = 'commissions/request_form.html'
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     def form_valid(self, form):
+        service = CommissionService(user=self.request.user)
         try:
-            self.object = CommissionService.create_commission(
-                author=self.request.user.profile,
-                data=form.cleaned_data,
-                jobs_data=[]  # TO-DO: Implement the creation of Jobs.
+            commission_data = form.cleaned_data
+            commission_data.pop('maker', None)
+            commission_data.pop('job_status', None)
+
+            self.object = service.create_commission(
+                data=commission_data,
+                jobs_data=[
+                    # TO-DO: Implement the creation of Jobs.
+                    # Placeholder:
+                    {
+                        'role': 'Placeholder Role',
+                        'manpower_required': 1,
+                    },
+                ]
             )
 
             return redirect(self.object)
@@ -70,6 +84,7 @@ class RequestUpdateView(LoginRequiredMixin, RoleRequiredMixin, UpdateView):
     template_name = 'commissions/request_form.html'
 
     def form_valid(self, form):
+        service = CommissionService(user=self.request.user)
         try:
             instance = self.get_object()
 

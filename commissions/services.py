@@ -10,39 +10,41 @@ from .models import (
 
 
 class CommissionService:
-    @staticmethod
-    def get_all_commissions():
+    def __init__(self, user=None):
+        self.user = user
+
+    def get_all_commissions(self):
         return Commission.objects.all()
 
-    @staticmethod
-    def get_commission(pk):
+    def get_commission(self, pk):
         try:
             return Commission.objects.get(pk=pk)
         except Commission.DoesNotExist:
             return None
 
-    @staticmethod
     @transaction.atomic
-    def create_commission(author, data, jobs_data):
-        commission = Commission.objects.create(
-            maker=author,
+    def create_commission(self, data, jobs_data):
+        commission = Commission(
+            maker=self.user.profile,
             **data
         )
 
-        jobs = [
-            Job(
-                commission=commission,
-                **job_data
-            ) for job_data in jobs_data
-        ]
+        jobs = []
+        for jd in jobs_data:
+            job = Job(commission=commission, **jd)
+            job.sync_status()
+            jobs.append(job)
 
+        commission.sync_jobs_status(job_list=jobs)
+
+        commission.save()
         Job.objects.bulk_create(jobs)
 
         return commission
 
-    @staticmethod
-    def apply_to_job(applicant, job):
+    def apply_to_job(self, applicant, job):
         invalid_conditions = [
+            # Fix: These hit the db more than neccessary.
             JobApplication.objects.filter(
                 applicant=applicant, job=job
             ).exists(),
@@ -60,29 +62,21 @@ class CommissionService:
 
         return True
 
-    @staticmethod
-    def sync_commission_status(commission):
-        if commission.status > 1:
-            return
+    def sync_commission_status(self, commission):
+        if commission.sync_jobs_status():
+            commission.save()
+            return True
+        return False
 
-        has_job_openings = commission.jobs.filter(status=0).exists()
-
-        new_status = 0 if has_job_openings else 1
-
-        if commission.status != new_status:
-            commission.status = new_status
-            commission.save(update_fields=['status'])
-
-    @staticmethod
-    def get_commission_summary(commission):
+    def get_commission_summary(self, commission):
+        # Fix: Make more concise
         return {
             'pk': commission.pk,
             'title': commission.title,
             'type': commission.type.name if commission.type else None,
-            'maker': commission.maker.user.username,
-            'status': dict(Commission.STATUSES).get(
-                commission.status, "Unknown"
-            ),
+            'maker': commission.maker.user.profile,
+            'status': commission.get_status,
+            'jobs_status': commission.get_jobs_status,
             'people_required': commission.people_required,
             'total_manpower': Coalesce(
                 Sum('manpower_required'), 0

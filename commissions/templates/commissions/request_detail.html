@@ -6,8 +6,32 @@
     <h2>Commission Request Details</h2>
     <hr>
     <h2>{{ request.title }}</h2>
+    <h3>By {{ request.maker }}</h3>
+
+    <table>
+        <tr>
+            <th>Status</th>
+            
+            <td>
+                {% if request.status != 0 %}
+                    {{ request.get_status }}
+                {% else %}
+                    {{ request.get_jobs_status }}
+                {% endif %}
+            </td>
+        </tr>
+        {% if request.status == 0 %}
+        <tr>
+            <th>People Required</th>
+            <td>{{ request.people_required }}</td>
+        </tr>
+        {% endif %}
+    </table>
+
     <p>{{ request.description }}</p>
+
     <br>
+
     <h3>Type</h3>
     {% if request.type %}
     <h4>{{ request.type }}</h4>
@@ -15,11 +39,8 @@
     {% else %}
     <h4>None</h4>
     {% endif %}
+
     <table>
-        <tr>
-            <th>People Required</th>
-            <td>{{ request.people_required }}</td>
-        </tr>
         <tr>
             <th>Created On</th>
             <td>{{ request.created_on }}</td>
@@ -29,5 +50,6 @@
             <td>{{ request.updated_on }}</td>
         </tr>
     </table>
+
     <a href="/commissions/requests" class="btn align-right">Back</a>
 {% endblock %}

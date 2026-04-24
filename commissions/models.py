@@ -6,10 +6,12 @@ from accounts.models import Profile
 JOB_STATUS = [
     (0, 'Open'),
     (1, 'Full'),
+    (2, 'Closed')
 ]
-COMMISSION_STATUS = JOB_STATUS + [
-    (2, 'Completed'),
-    (3, 'Discontinued')
+COMMISSION_STATUS = [
+    (0, 'Ongoing'),
+    (1, 'Completed'),
+    (2, 'Discontinued')
 ]
 APPLICATION_STATUS = [
     (0, 'Pending'),
@@ -50,6 +52,10 @@ class Commission(models.Model):
         choices=COMMISSION_STATUS,
         default=0
     )
+    jobs_status = models.IntegerField(
+        choices=JOB_STATUS,
+        default=0
+    )
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 
@@ -58,6 +64,42 @@ class Commission(models.Model):
 
     def get_absolute_url(self):
         return reverse('request_detail', kwargs={'pk': self.pk})
+
+    def get_status(self):
+        return dict(COMMISSION_STATUS).get(
+            self.status, "Unknown"
+        )
+
+    def get_jobs_status(self):
+        return dict(JOB_STATUS).get(
+            self.jobs_status, "Unknown"
+        )
+
+    def sync_jobs_status(self, job_list=None):
+        new_jobs_status = 2
+        if self.status == 0:
+            if job_list is not None:
+                job_openings = sum(
+                    1 for j in job_list if j.status == 0
+                )
+            else:
+                job_openings = self.jobs.filter(status=0).count()
+            new_jobs_status = 0 if job_openings > 0 else 1
+
+        if self.jobs_status != new_jobs_status:
+            self.jobs_status = new_jobs_status
+            return True
+
+        return False
+
+    def set_status(self, status):
+        if self.status == status:
+            return False
+
+        self.status = status
+        self.update_jobs_status()
+        self.jobs.update_status()
+        return True
 
     class Meta:
         ordering = ['created_on']
@@ -80,6 +122,30 @@ class Job(models.Model):
 
     def __str__(self):
         return f"{self.role} Role in {self.commission} Commission"
+
+    def get_status(self):
+        return dict(JOB_STATUS).get(
+            self.status, "Unknown"
+        )
+
+    def sync_status(self):
+        new_status = 2
+        if self.commission.status == 0:
+            if self.pk is None:
+                accepted_applications = 0
+            else:
+                accepted_applications = self.applications.filter(
+                    status=1
+                ).count()
+            new_status = (
+                0 if accepted_applications < self.manpower_required else 1
+            )
+
+        if self.status != new_status:
+            self.status = new_status
+            return True
+
+        return False
 
     class Meta:
         ordering = [
@@ -110,6 +176,11 @@ class JobApplication(models.Model):
 
     def __str__(self):
         return f"{self.job.role} Application of {self.applicant}"
+
+    def get_status(self):
+        return dict(APPLICATION_STATUS).get(
+            self.status, "Unknown"
+        )
 
     class Meta:
         ordering = [

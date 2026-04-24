@@ -8,7 +8,16 @@
     {% for request in requests %}
         <div class="list-item">
             <h3>{{ request.title }}</h3>
+            <p>By {{ request.maker }}</p>
+            <p>
+                {% if request.status != 0 %}
+                    {{ request.get_status }}
+                {% else %}
+                    {{ request.get_jobs_status }}
+                {% endif %}
+            </p>
             <p><i>{{ request.type }}</i></p>
+
             <a href="{{ request.get_absolute_url }}"
             class="btn align-left">
                 View Request

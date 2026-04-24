@@ -31,6 +31,8 @@ class CommissionAdmin(admin.ModelAdmin):
         'type',
         'maker',
         'people_required',
+        'status',
+        'jobs_status',
         'created_on',
         'updated_on'
     ]

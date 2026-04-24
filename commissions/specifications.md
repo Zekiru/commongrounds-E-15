@@ -82,14 +82,14 @@
 - [x] *create_commission* must use *transaction.atomic()* to ensure the Commission and its Jobs are created together or not at all.
 
 ## Modifications
-- [ ] Modify Commission *status* Field Choices:
+- [x] Modify Commission *status* Field Choices:
     - 0: Ongoing (default)
     - 1: Completed
     - 2: Discontinued
-- [ ] Create New Field - *recruitment_status*:
+- [x] Create New Field - *jobs_status*:
     - 0: Open (default)
     - 1: Full
     - 2: Closed
-- [ ] *recruitment_status* field cannot be modified by any user.
-- [ ] If *Status* != 0, then *recruitment_status* = 2.
+- [x] *jobs_status* field cannot be modified by users.
+- [x] If *status* != 0, then *recruitment_status* = 2.
     - Updated when *status* is modified
