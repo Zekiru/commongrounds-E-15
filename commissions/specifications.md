@@ -1,6 +1,6 @@
 # Commissions Requests App
 
-- [ ] Pattern: Facade / Service Layer
+- [x] Pattern: Facade / Service Layer
 - [x] app_name: commissions
 
 ## Models
@@ -58,17 +58,17 @@
     - [ ] When the number of JobApplication entries with “Accepted” status is greater than or equal to the Job’s manpower required, the “Apply to Job” button should not be clickable.
     - [ ] In this view, if the Commission's owner is the logged-in user, there should be an edit link that will lead to the update view.
 
-- [ ] Create View
-    - [ ] This view is only available if the Profile has the role “Commission Maker”.
-    - [ ] This should only be accessible to logged-in users.
-    - [ ] All fields should be available, including the corresponding Job objects, and the Maker field is set to the logged in user that is not editable.
-    - [ ] Status field should be a dropdown.
+- [x] Create View
+    - [x] This view is only available if the Profile has the role “Commission Maker”.
+    - [x] This should only be accessible to logged-in users.
+    - [x] All fields should be available, including the corresponding Job objects, and the Maker field is set to the logged in user that is not editable.
+    - [x] Status field should be a dropdown.
 
-- [ ] Update View
-    - [ ] This view is only available if the Profile has the role “Commission Maker”.
-    - [ ] This should only be accessible to logged-in users.
-    - [ ] It should allow updates of all fields except the Maker field.
-    - [ ] When all the commission’s jobs’ statuses are “Full”, the commission’s status should be set to “Full”.
+- [x] Update View
+    - [x] This view is only available if the Profile has the role “Commission Maker”.
+    - [x] This should only be accessible to logged-in users.
+    - [x] It should allow updates of all fields except the Maker field.
+    - [x] When all the commission’s jobs’ statuses are “Full”, the commission’s status should be set to “Full”.
 
 ## Advanced Requirements
 - [x] Create a CommissionService class in *commissions/services.py*. Views must not contain business logic directly — all coordination between models must go through this service. It must implement the following methods:

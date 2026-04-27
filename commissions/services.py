@@ -77,6 +77,7 @@ class CommissionService:
 
             jd.pop('commission', None)
             jd.pop('status', None)
+            jd.pop('DELETE', None)
 
             if job_instance:  # update
                 for attr, value in jd.items():
@@ -92,7 +93,6 @@ class CommissionService:
                 all_active_jobs.append(new_job)
 
         instance.sync_jobs_status(job_list=all_active_jobs)
-        # instance.sync_jobs_status()
         instance.save()
 
         if jobs_to_create:

@@ -3,7 +3,11 @@
 {% block title %}Commission Request Details{% endblock %}
 
 {% block content %}
-    <h2>Commission Request Details</h2>
+    <div class="row">
+        <h2 class="align-left">Commission Request Details</h2>
+        <a class="btn add-btn align-right"
+        href="{% url 'request_update' pk=request.pk %}">Update Request</a>
+    </div>
     <hr>
     <h2>{{ request.title }}</h2>
     <h3>By {{ request.maker }}</h3>

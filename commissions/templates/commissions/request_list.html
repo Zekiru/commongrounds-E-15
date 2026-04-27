@@ -3,7 +3,11 @@
 {% block title %}Commission Requests{% endblock %}
 
 {% block content %}
-    <h2>List of Commission Requests</h2>
+    <div class="row">
+        <h2 class="align-left">List of Commission Requests</h2>
+        <a class="btn add-btn align-right"
+        href="{% url 'request_create' %}">Create Request</a>
+    </div>
     <div class="list-wrapper">
     {% for request in requests %}
         <div class="list-item">

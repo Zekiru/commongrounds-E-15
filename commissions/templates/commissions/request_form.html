@@ -4,7 +4,11 @@
 
 {% block content %}
     <div class="form-wrapper-2">
-        <h2>Create Request</h2>
+        {% if object %}
+            <h2>Update Request</h2>
+        {% else %}
+            <h2>Create Request</h2>
+        {% endif %}
         <form class="form-group" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             
@@ -55,8 +59,15 @@
         </form>
     </div>
 
-    <a href="{% url 'request_list' %}"
-    class="align-right btn">Back</a>
+    {% if object %}
+        <a href="{% url 'request_detail' object.pk %}" class="align-right btn">
+            Back to Details
+        </a>
+    {% else %}
+        <a href="{% url 'request_list' %}" class="align-right btn">
+            Back to List
+        </a>
+    {% endif %}
 {% endblock %}
 
 {% block scripts %}
