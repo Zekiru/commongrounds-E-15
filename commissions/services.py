@@ -73,15 +73,15 @@ class CommissionService:
         all_active_jobs = []
 
         for jd in jobs_data:
-            job_instance = jd.pop('id', None) 
-            
+            job_instance = jd.pop('id', None)
+
             jd.pop('commission', None)
             jd.pop('status', None)
 
             if job_instance:  # update
                 for attr, value in jd.items():
                     setattr(job_instance, attr, value)
-                
+
                 job_instance.sync_status()
                 jobs_to_update.append(job_instance)
                 all_active_jobs.append(job_instance)
@@ -97,7 +97,7 @@ class CommissionService:
 
         if jobs_to_create:
             Job.objects.bulk_create(jobs_to_create)
-            
+
         if jobs_to_update:
             for job in jobs_to_update:
                 job.save()

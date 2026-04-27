@@ -35,8 +35,8 @@ class JobForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if 'status' in self.fields:
-                self.fields['commission'].disabled = True
-                self.fields['status'].disabled = True
+            self.fields['commission'].disabled = True
+            self.fields['status'].disabled = True
 
 
 class BaseJobFormSet(BaseInlineFormSet):
