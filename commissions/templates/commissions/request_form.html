@@ -5,12 +5,41 @@
 {% block content %}
     <div class="form-wrapper-2">
         <h2>Create Request</h2>
-        <form class="form-group" method="POST"
-        enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form }}
-        <br>
-        <button type="submit">Submit</button>
+        <form class="form-group" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            {# Parent Commission Form #}
+            {{ form }}
+
+            <br><hr>
+            <h3>Jobs / Requirements</h3>
+            
+            {# Management Form: Critical for formsets #}
+            {{ jobs_formset.management_form }}
+            
+            <div id="jobs-container">
+                {% for job_form in jobs_formset %}
+                    <div class="job-item">
+                        {{ job_form }}
+                    </div>
+                {% endfor %}
+            </div>
+
+            {# Template for New Forms #}
+            <div id="empty-form-template">
+                <div class="job-item" style="border-bottom: 1px solid #ccc; margin-bottom: 10px;">
+                    {{ jobs_formset.empty_form }}
+                </div>
+            </div>
+
+            <button type="button" 
+            id="add-job-btn" class="btn">
+                + Add Another Job
+            </button>
+
+            <br>
+            <button type="submit" 
+            class="btn btn-primary">Submit</button>
         </form>
     </div>
 

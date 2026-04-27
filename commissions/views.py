@@ -9,7 +9,9 @@ from .models import (
     JobApplication
 )
 from .forms import (
-    CommissionForm
+    CommissionForm,
+    JobFormSetCreate,
+    JobFormSetUpdate
 )
 from accounts.mixins import RoleRequiredMixin
 from .services import CommissionService
@@ -52,23 +54,45 @@ class RequestCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
         kwargs['user'] = self.request.user
         return kwargs
 
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        if self.request.POST:
+            data['jobs_formset'] = JobFormSetCreate(
+                self.request.POST,
+            )
+        else:
+            data['jobs_formset'] = JobFormSetCreate()
+        return data
+
     def form_valid(self, form):
+        context = self.get_context_data()
+        formset = context['jobs_formset']
         service = CommissionService(user=self.request.user)
+
+        if not formset.is_valid():
+            return self.form_invalid(form)
+
         try:
             commission_data = form.cleaned_data
+            jobs_data = [
+                f.cleaned_data for f in formset
+                if f.cleaned_data and not f.cleaned_data.get(
+                    'DELETE'
+                )
+            ]
+
             commission_data.pop('maker', None)
             commission_data.pop('job_status', None)
+            for job in jobs_data:
+                job.pop('commission', None)
+                job.pop('status', None)
+
+            print(commission_data)
+            print(jobs_data)
 
             self.object = service.create_commission(
                 data=commission_data,
-                jobs_data=[
-                    # TO-DO: Implement the creation of Jobs.
-                    # Placeholder:
-                    {
-                        'role': 'Placeholder Role',
-                        'manpower_required': 1,
-                    },
-                ]
+                jobs_data=jobs_data
             )
 
             return redirect(self.object)
@@ -83,8 +107,32 @@ class RequestUpdateView(LoginRequiredMixin, RoleRequiredMixin, UpdateView):
     form_class = CommissionForm
     template_name = 'commissions/request_form.html'
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        if self.request.POST:
+            data['jobs_formset'] = JobFormSetUpdate(
+                self.request.POST,
+                instance=self.object
+            )
+        else:
+            data['jobs_formset'] = JobFormSetUpdate(
+                instance=self.object
+            )
+        return data
+
     def form_valid(self, form):
+        context = self.get_context_data()
+        formset = context['jobs_formset']
         service = CommissionService(user=self.request.user)
+
+        if not formset.is_valid():
+            return self.form_invalid(form)
+
         try:
             instance = self.get_object()
 
