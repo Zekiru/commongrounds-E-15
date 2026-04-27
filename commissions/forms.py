@@ -1,4 +1,5 @@
 from django import forms
+from extra_views import InlineFormSetFactory
 from django.forms import (
     BaseInlineFormSet,
     inlineformset_factory
@@ -26,10 +27,21 @@ class CommissionForm(forms.ModelForm):
         self.fields['jobs_status'].disabled = True
 
 
+class JobForm(forms.ModelForm):
+    class Meta:
+        model = Job
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'status' in self.fields:
+                self.fields['commission'].disabled = True
+                self.fields['status'].disabled = True
+
+
 class BaseJobFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
-        # Ensure at least one job is provided
         if any(self.errors):
             return
 
@@ -45,20 +57,34 @@ class BaseJobFormSet(BaseInlineFormSet):
                 'At least one job is required.'
             )
 
+    def get_jobs_data(self):
+        return [
+            f.cleaned_data for f in self.forms
+            if f.cleaned_data and not f.cleaned_data.get('DELETE')
+        ]
 
-JobFormSetCreate = inlineformset_factory(
-    Commission, Job,
-    formset=BaseJobFormSet,
-    fields='__all__',
-    extra=0,
-    can_delete=False
-)
+    def get_jobs_to_delete(self):
+        return [
+            f.cleaned_data for f in self.forms
+            if f.cleaned_data and f.cleaned_data.get('DELETE')
+        ]
 
 
-JobFormSetUpdate = inlineformset_factory(
-    Commission, Job,
-    formset=BaseJobFormSet,
-    fields='__all__',
-    extra=0,
-    can_delete=True
-)
+class JobCreateInline(InlineFormSetFactory):
+    model = Job
+    form_class = JobForm
+    formset_class = BaseJobFormSet
+    factory_kwargs = {
+        'extra': 1,
+        'can_delete': False
+    }
+
+
+class JobUpdateInline(InlineFormSetFactory):
+    model = Job
+    form_class = JobForm
+    formset_class = BaseJobFormSet
+    factory_kwargs = {
+        'extra': 0,
+        'can_delete': True
+    }

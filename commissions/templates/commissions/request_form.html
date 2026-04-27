@@ -8,33 +8,45 @@
         <form class="form-group" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             
-            {# Parent Commission Form #}
             {{ form }}
 
             <br><hr>
-            <h3>Jobs / Requirements</h3>
+            <h2>Jobs</h2>
             
-            {# Management Form: Critical for formsets #}
-            {{ jobs_formset.management_form }}
-            
-            <div id="jobs-container">
-                {% for job_form in jobs_formset %}
-                    <div class="job-item">
-                        {{ job_form }}
-                    </div>
-                {% endfor %}
-            </div>
+            {% for inline in inlines %}
+                
+                {{ inline.management_form }}
 
-            {# Template for New Forms #}
-            <div id="empty-form-template">
-                <div class="job-item" style="border-bottom: 1px solid #ccc; margin-bottom: 10px;">
-                    {{ jobs_formset.empty_form }}
+                <div id="jobs-container">
+                    {% for job_form in inline %}
+                        <div class="job-form-row">
+                            <div class="job-item">
+                                {{ job_form }}
+                            </div>
+                            <button type="button" class="btn remove-btn"
+                            style="display: none;">
+                                Remove Job
+                            </button>
+                        </div>
+                    {% endfor %}
                 </div>
-            </div>
 
-            <button type="button" 
-            id="add-job-btn" class="btn">
-                + Add Another Job
+                <div id="empty-form-template" style="display: none;">
+                    <div class="job-form-row">
+                        <div class="job-item">
+                            {{ inline.empty_form }}
+                        </div>
+                        <button type="button" class="btn remove-btn">
+                            Remove Job
+                        </button>
+                    </div>
+                </div>
+
+            {% endfor %}
+
+
+            <button type="button" class="btn add-btn" id="add-job-btn">
+                Add Job
             </button>
 
             <br>
@@ -45,4 +57,65 @@
 
     <a href="{% url 'request_list' %}"
     class="align-right btn">Back</a>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    // This JavaScript remains completely identical to the previous version!
+    // Because extra-views generates standard Django formsets, our script 
+    // dynamically finds the correct prefix and management forms automatically.
+
+    const addBtn = document.getElementById('add-job-btn');
+    const container = document.getElementById('jobs-container');
+    const emptyFormTemplate = document.getElementById('empty-form-template').innerHTML;
+    
+    const totalForms = document.querySelector('input[name$="-TOTAL_FORMS"]');
+    const formPrefix = totalForms.name.replace('-TOTAL_FORMS', '');
+
+    // --- ADD FORM LOGIC ---
+    addBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const currentFormCount = parseInt(totalForms.value);
+        const regex = new RegExp('__prefix__', 'g');
+        const newFormHtml = emptyFormTemplate.replace(regex, currentFormCount);
+        container.insertAdjacentHTML('beforeend', newFormHtml);
+        totalForms.value = currentFormCount + 1;
+    });
+
+    // --- REMOVE FORM LOGIC ---
+    container.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-btn')) {
+            e.preventDefault();
+            const row = e.target.closest('.job-form-row');
+            const deleteInput = row.querySelector('input[name$="-DELETE"]');
+            
+            if (deleteInput) {
+                deleteInput.checked = true;
+                row.style.display = 'none';
+            } else {
+                row.remove();
+                updateFormIndexes();
+            }
+        }
+    });
+
+    // --- RE-INDEXING LOGIC ---
+    function updateFormIndexes() {
+        const rows = container.querySelectorAll('.job-form-row');
+        const regex = new RegExp(`${formPrefix}-\\d+`);
+        
+        rows.forEach((row, index) => {
+            row.querySelectorAll('input, select, textarea, label').forEach(el => {
+                const newPrefix = `${formPrefix}-${index}`;
+                if (el.name) el.name = el.name.replace(regex, newPrefix);
+                if (el.id) el.id = el.id.replace(regex, newPrefix);
+                if (el.htmlFor) el.htmlFor = el.htmlFor.replace(regex, newPrefix);
+            });
+        });
+        
+        totalForms.value = rows.length;
+    }
+});
+</script>
 {% endblock %}
