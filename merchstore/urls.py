@@ -23,7 +23,7 @@ urlpatterns = [
         name="merchstore_create"
     ),
     path(
-        'item/<int:pk>/edit',
+        'item/<int:pk>/edit/',
         ProductUpdateView.as_view(),
         name="merchstore_update"
     ),

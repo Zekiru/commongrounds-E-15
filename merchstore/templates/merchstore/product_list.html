@@ -23,17 +23,33 @@
         </div>
     </div>
     <div class="list-wrapper">
-    {% for product in products %}
-        <div class="list-item">
-            <h3>{{ product.name }}</h3>
-            <p>Price: <i>{{ product.price }}</i></p>
-            <a href="{{ product.get_absolute_url }}"
-            class="btn align-left">
-                View Product
-            </a>
-        </div>
-    {% empty %}
-        <p>No products available.</p>
-    {% endfor %}
+        {% if user.is_authenticated %}
+            <h3>Your Products</h3>
+            {% for product in user_products %}
+            <div class="list-item">
+                <h3>{{ product.name }}</h3>
+                <p>Price: <i>{{ product.price }}</i></p>
+                <a href="{{ product.get_absolute_url }}"
+                class="btn align-left">
+                    View Product
+                </a>
+            </div>
+            {% empty %}
+                <p>You are not selling your products.</p>
+            {% endfor %}
+        {% endif %}
+        <h3>All Products</h3>
+        {% for product in all_products %}
+            <div class="list-item">
+                <h3>{{ product.name }}</h3>
+                <p>Price: <i>{{ product.price }}</i></p>
+                <a href="{{ product.get_absolute_url }}"
+                class="btn align-left">
+                    View Product
+                </a>
+            </div>
+        {% empty %}
+            <p>No products available.</p>
+        {% endfor %}
     </div>
 {% endblock %}

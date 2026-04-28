@@ -56,19 +56,20 @@ class ProductDetailView(DetailView):
             transaction.product = product
             transaction.status = "OC"
 
-            if product.stock <= 0:
+            if product.stock < transaction.amount:
                 return redirect('merchstore_detail', pk=product.pk)
 
-            if product.stock >= transaction.amount:
-                product.stock -= transaction.amount
+            product.stock -= transaction.amount
 
-                if product.stock == 0:
-                    product.status = "Out of stock"
+            if product.stock == 0:
+                product.status = "OOS"
 
-                product.save()
-                transaction.save()
+            product.save()
+            transaction.save()
 
-        return redirect('merchstore_cart')
+            return redirect('merchstore_cart')
+
+        return redirect('merchstore_detail', pk=pk)
 
 
 class ProductCreateView(RoleRequiredMixin, LoginRequiredMixin, CreateView):
@@ -93,9 +94,11 @@ class ProductUpdateView(RoleRequiredMixin, LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         if form.instance.stock == 0:
-            form.instance.status = "Out of stock"
+            form.instance.status = "OOS"
+        elif form.instance.status in ["OS"]:
+            form.instance.status = "OS"
         else:
-            form.instance.status = "Available"
+            form.instance.status = "A"
         return super().form_valid(form)
 
 
