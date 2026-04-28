@@ -16,9 +16,6 @@ class ProductListView(ListView):
     template_name = "merchstore/product_list.html"
     context_object_name = 'products'
 
-    def get_queryset(self):
-        return Product.objects.all().order_by('name')
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -49,6 +46,9 @@ class ProductDetailView(DetailView):
 
         if not request.user.is_authenticated:
             return redirect('accounts:login')
+        
+        if product.owner == request.user.profile:
+            return redirect('merchstore_detail', pk=product.pk)
 
         if form.is_valid():
             transaction = form.save(commit=False)
@@ -56,12 +56,15 @@ class ProductDetailView(DetailView):
             transaction.product = product
             transaction.status = "OC"
 
+            if product.stock == 0:
+                return redirect('merchstore_detail', pk=product.pk)
+
             if product.stock >= transaction.amount:
                 product.stock -= transaction.amount
                 product.save()
                 transaction.save()
 
-        return redirect('merchstore:merchstore-cart')
+        return redirect('merchstore_cart')
 
 
 class ProductCreateView(RoleRequiredMixin, LoginRequiredMixin, CreateView):

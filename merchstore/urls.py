@@ -10,31 +10,31 @@ urlpatterns = [
     path(
         'items/',
         ProductListView.as_view(),
-        name="merchstore-list"
+        name="merchstore_list"
     ),
     path(
         'item/<int:pk>/',
         ProductDetailView.as_view(),
-        name="merchstore-detail"
+        name="merchstore_detail"
     ),
     path(
         'item/add/',
         ProductCreateView.as_view(),
-        name="merchstore-create"
+        name="merchstore_create"
     ),
     path(
         'item/<int:pk>/edit',
         ProductUpdateView.as_view(),
-        name="merchstore-update"
+        name="merchstore_update"
     ),
     path(
         'cart/',
         CartView.as_view(),
-        name="merchstore-cart"
+        name="merchstore_cart"
     ),
     path(
         'transactions/',
         TransactionsListView.as_view(),
-        name="merchstore-transactions"
+        name="merchstore_transactions"
     ),
 ]

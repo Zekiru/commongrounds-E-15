@@ -3,7 +3,25 @@
 {% block title %}Merch Store List{% endblock %}
 
 {% block content %}
-    <h2>List of Products</h2>
+    <div class="row">
+        <h2 class="align-left">List of Products</h2>
+        <div class="div-right">
+            {% if user.is_authenticated %}
+                <a class="btn"
+                href="{% url 'merchstore_cart' %}">
+                    My Cart
+                </a>
+            {% endif %}
+            {% if user.is_authenticated and user.profile.role == "MS" %}
+                <a href="{% url 'merchstore_transactions' %}">
+                    View My Sales
+                </a>
+                <a class="btn add-btn align-right"
+                href="{% url 'merchstore_create' %}">
+                Create product</a>
+            {% endif %}
+        </div>
+    </div>
     <div class="list-wrapper">
     {% for product in products %}
         <div class="list-item">
@@ -18,5 +36,4 @@
         <p>No products available.</p>
     {% endfor %}
     </div>
-    <a href="{% url 'merchstore:merchstore-create' %}">Create Product</a>
 {% endblock %}

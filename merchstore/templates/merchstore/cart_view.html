@@ -17,6 +17,7 @@
             {% endfor %}
         </ul>
     {% empty %}
-        <p>No items in cart.</p>
+        <p>Your cart is empty.</p>
     {% endfor %}
+    <a href="{% url 'merchstore_list' %}" class="btn align-right">Back</a>
 {% endblock %}

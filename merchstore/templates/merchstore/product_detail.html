@@ -27,11 +27,15 @@
             <th>Stock</th>
             <td>{{ product.stock }}</td>
         </tr>
+        <tr>
+            <th>Status</th>
+            <td>{{ product.status }}</td>
+        </tr>
     </table>
     {% if user.is_authenticated and user.profile != product.owner %}
         <form method="POST">
             {% csrf_token %}
-            {{ form }}
+            {{ form.as_p }}
 
 
             <button type="submit"
@@ -42,8 +46,8 @@
     {% endif %}
 
 
-    {% if user.profile == product.owner %}
-        <a href="{% url 'merchstore:merchstore-update' product.id %}">
+    {% if user.is_authenticated and user.profile == product.owner %}
+        <a href="{% url 'merchstore_update' product.id %}">
             Edit Product
         </a>
     {% endif %}
