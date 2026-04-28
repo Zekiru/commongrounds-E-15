@@ -1,4 +1,4 @@
-# CSC40 Midterm Project
+# CSCI40-E-15 Midterm Project
 
 ## Members
 - Chua, Phoebe

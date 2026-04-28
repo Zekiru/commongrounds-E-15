@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Common Grounds{% endblock %}
+
+{% block content %}
+    <h2>Directory</h2>
+    <div class="list-wrapper">
+        <div class="list-item">
+            <a href="/merchstore/items"
+            class="directory-btn">
+                Merchandise Store
+            </a>
+        </div>
+        <div class="list-item">
+            <a href="/localevents/events"
+            class="directory-btn">
+                Local Events
+            </a>
+        </div>
+        <div class="list-item">
+            <a href="/bookclub/books"
+            class="directory-btn">
+                Book Club
+            </a>
+        </div>
+        <div class="list-item">
+            <a href="/diyprojects/projects"
+            class="directory-btn">
+                DIY Projects
+            </a>
+        </div>
+        <div class="list-item">
+            <a href="/commissions/requests"
+            class="directory-btn">
+                Commission Requests
+            </a>
+        </div>
+    </div>
+{% endblock %}

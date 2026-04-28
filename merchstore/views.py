@@ -6,8 +6,10 @@ from .models import Product, Transaction
 from accounts.mixins import RoleRequiredMixin
 from .forms import TransactionForm
 
+
 def index(request):
         return redirect('items/')
+
 
 class ProductListView(ListView):
     model = Product
@@ -89,6 +91,7 @@ class ProductUpdateView(RoleRequiredMixin, LoginRequiredMixin, UpdateView):
             form.instance.status = "Available"
         return super().form_valid(form)
 
+
 class CartView(LoginRequiredMixin, ListView):
     model = Transaction
     template_name = "merchstore/cart_view.html"
@@ -96,6 +99,7 @@ class CartView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Transaction.objects.filter(buyer=self.request.user.profile)
+
 
 class TransactionsListView(LoginRequiredMixin, ListView):
     model = Transaction

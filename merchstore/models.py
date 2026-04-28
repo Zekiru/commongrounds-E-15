@@ -4,17 +4,19 @@ from django.core.validators import MinValueValidator
 
 from accounts.models import Profile 
 
+
 class ProductType(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
-    
+
     def __str__(self):
         return self.name
-    
+
     class Meta:
         ordering = ['name']
         verbose_name = 'product type'
         verbose_name_plural = 'product types'
+
 
 class Product(models.Model):
     name = models.CharField(
@@ -51,13 +53,13 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
-        
+
     def get_absolute_url(self):
         return reverse(
-            'merchstore:merchstore-detail',
+            'merchstore-detail',
             args=[str(self.id)]
         )
-    
+
     class Meta:
         ordering = ['name']
         verbose_name = 'product'

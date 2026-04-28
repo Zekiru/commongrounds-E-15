@@ -1,5 +1,33 @@
+# Virtual environments
 myenv/
-__pycache__/
+env/
+venv/
+lib/
+lib64/
+include/
+bin/
+share/
+
+# Python
 *.pyc
-db.sqlite3 
-*.env
+__pycache__
+*.log
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+htmlcov/
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+target/
+
+# Django-specific
+*.mo
+*.pot
+local_settings.py
+.env
+db.sqlite3
+media/
+static_collected/

@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Product, ProductType, Transaction
 
+
 class ProductInLine(admin.TabularInline):
     model = Product
 
@@ -12,6 +13,7 @@ class ProductTypeAdmin(admin.ModelAdmin):
     ]
     ordering = ['name']
     inlines = [ProductInLine]
+
 
 class ProductAdmin(admin.ModelAdmin):
     model = Product

@@ -38,5 +38,3 @@ urlpatterns = [
         name="merchstore-transactions"
     ),
 ]
-
-app_name = "merchstore"
