@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='product',
             name='status',
-            field=models.CharField(choices=[('A', 'Available'), ('OS', 'On sale'), ('OOS', 'Out of stock')], default='A', max_length=3),
+            field=models.CharField(choices=[('Available', 'Available'), ('On sale', 'On sale'), ('Out of stock', 'Out of stock')], default='Available', max_length=3),
         ),
         migrations.AddField(
             model_name='product',
@@ -41,7 +41,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('amount', models.PositiveIntegerField(validators=[django.core.validators.MinValueValidator(1)])),
-                ('status', models.CharField(choices=[('OC', 'On cart'), ('TP', 'To pay'), ('TS', 'To ship'), ('TR', 'To receive'), ('D', 'Delivered')], max_length=5)),
+                ('status', models.CharField(choices=[('On cart', 'On cart'), ('To pay', 'To pay'), ('To ship', 'To ship'), ('To receive', 'To receive'), ('Delivered', 'Delivered')], max_length=5)),
                 ('created_on', models.DateTimeField(auto_now_add=True)),
                 ('buyer', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='accounts.profile')),
                 ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='merchstore.product')),

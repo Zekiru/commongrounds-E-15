@@ -41,14 +41,14 @@ class Product(models.Model):
     )
     stock = models.PositiveIntegerField()
     STATUS = [
-        ("A", "Available"),
-        ("OS", "On sale"),
-        ("OOS", "Out of stock"),
+        ("Available", "Available"),
+        ("On sale", "On sale"),
+        ("Out of stock", "Out of stock"),
     ]
     status = models.CharField(
-        max_length = 3,
+        max_length = 20,
         choices = STATUS,
-        default = "A"
+        default = "Available"
     )
 
     def __str__(self):
@@ -80,14 +80,14 @@ class Transaction(models.Model):
         validators=[MinValueValidator(1)]
     )
     STATUS = [
-        ("OC", "On cart"),
-        ("TP", "To pay"),
-        ("TS", "To ship"),
-        ("TR", "To receive"),
-        ("D", "Delivered"),
+        ("On cart", "On cart"),
+        ("To pay", "To pay"),
+        ("To ship", "To ship"),
+        ("To receive", "To receive"),
+        ("Delivered", "Delivered"),
     ]
     status = models.CharField(
-        max_length = 5,
+        max_length = 20,
         choices = STATUS
     )
     created_on = models.DateTimeField(

@@ -21,7 +21,7 @@ class ProductListView(ListView):
 
         if self.request.user.is_authenticated:
             user_products = Product.objects.filter(owner=self.request.user.profile)
-            all_products = Product.objects.exclude(owner=self.request.user.profile)
+            all_products = Product.objects.exclude(owner=self.request.user.profile).exclude(status="On sale")
         else:
             user_products = []
             all_products = Product.objects.all()
@@ -54,7 +54,7 @@ class ProductDetailView(DetailView):
             transaction = form.save(commit=False)
             transaction.buyer = request.user.profile
             transaction.product = product
-            transaction.status = "OC"
+            transaction.status = "On cart"
 
             if product.stock < transaction.amount:
                 return redirect('merchstore_detail', pk=product.pk)
@@ -62,7 +62,7 @@ class ProductDetailView(DetailView):
             product.stock -= transaction.amount
 
             if product.stock == 0:
-                product.status = "OOS"
+                product.status = "Out of stock"
 
             product.save()
             transaction.save()
@@ -94,11 +94,11 @@ class ProductUpdateView(RoleRequiredMixin, LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         if form.instance.stock == 0:
-            form.instance.status = "OOS"
-        elif form.instance.status in ["OS"]:
-            form.instance.status = "OS"
+            form.instance.status = "Out of stock"
+        elif form.instance.status in ["On sale"]:
+            form.instance.status = "On sale"
         else:
-            form.instance.status = "A"
+            form.instance.status = "Available"
         return super().form_valid(form)
 
 
