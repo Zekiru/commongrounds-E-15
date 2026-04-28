@@ -3,21 +3,29 @@
 {% block title %}View Cart{% endblock %}
 
 {% block content %}
-    <h2>Your Cart</h2>
-    {% regroup transactions by product.owner as seller_list %}
-    {% for group in seller_list %}
-        <h3>Seller: {{ group.grouper.display_name }}</h3>
-        <ul>
-            {% for transaction in group.list %}
-                <li>
-                    {{ transaction.product.name }} -
-                    {{ transaction.amount }} pcs -
-                    {{ transaction.get_status_display }}
-                </li>
-            {% endfor %}
-        </ul>
-    {% empty %}
+    <div class ="row">
+        <h2 class="align-left">Your Cart</h2>
+    </div>
+
+    {% if transactions %}
+        {% regroup transactions by product.owner as seller_list %}
+        
+        {% for group in seller_list %}
+            <div class ="row">
+                <h3 class="align-left">Seller: {{ group.grouper.display_name }}</h2>
+            </div>
+            <div class="list-wrapper">
+                {% for transaction in group.list %}
+                    <div class="list-item">
+                        <h3>{{ transaction.product.name }}</h3>
+                        <p>Amount: <i>{{ transaction.amount }}</i></p> 
+                        <p>Status: {{ transaction.get_status_display }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    {% else %}
         <p>Your cart is empty.</p>
-    {% endfor %}
+    {% endif %}
     <a href="{% url 'merchstore_list' %}" class="btn align-right">Back</a>
 {% endblock %}

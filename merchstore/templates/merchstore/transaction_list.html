@@ -3,27 +3,30 @@
 {% block title %}Transactions List{% endblock %}
 
 {% block content %}
-    <h2>Your Sales</h2>
+    <div class ="row">
+        <h2 class="align-left">Your Sales</h2>
+    </div>
 
-    {% regroup transactions by buyer as buyer_list %}
+    {% if transactions %}
+        {% regroup transactions by buyer as buyer_list %}
 
-    {% for group in buyer_list %}
-        <h3>Buyer: {{ group.grouper.display_name }}</h3>
-
-        <ul>
-            {% for transaction in group.list %}
-                <li>
-                    <strong>Product:</strong> {{ transaction.product.name }} <br>
-                    <strong>Amount:</strong> {{ transaction.amount }} <br>
-                    <strong>Status:</strong> {{ transaction.get_status_display }} <br>
-                    <strong>Created:</strong> {{ transaction.created_on }} <br>
-                </li>
-                <hr>
-            {% endfor %}
-        </ul>
-
-    {% empty %}
+        {% for group in buyer_list %}
+            <div class="row">
+                <h3 class="align-left">Buyer: {{ group.grouper.display_name }}</h3>
+            </div>
+            <div class="list-wrapper">
+                {% for transaction in group.list %}
+                <div class="list-item">
+                    <h3>{{ transaction.product.name }}</h3>
+                    <p><i>Amount: {{ transaction.amount }}</i></p> 
+                    <p>Status: {{ transaction.get_status_display }} </p>
+                    <p>Created on: {{ transaction.created_on }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    {% else  %}
         <p>No transactions found.</p>
-    {% endfor %}
+    {% endif %}
     <a href="{% url 'merchstore_list' %}" class="btn align-right">Back</a>
 {% endblock %}

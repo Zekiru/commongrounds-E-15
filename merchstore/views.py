@@ -56,11 +56,15 @@ class ProductDetailView(DetailView):
             transaction.product = product
             transaction.status = "OC"
 
-            if product.stock == 0:
+            if product.stock <= 0:
                 return redirect('merchstore_detail', pk=product.pk)
 
             if product.stock >= transaction.amount:
                 product.stock -= transaction.amount
+
+                if product.stock == 0:
+                    product.status = "Out of stock"
+
                 product.save()
                 transaction.save()
 
