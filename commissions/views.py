@@ -1,6 +1,6 @@
 from django.shortcuts import redirect
 from django.views.generic import TemplateView
-# from django.views.generic.edit import CreateView, UpdateView
+from django.contrib.auth.mixins import UserPassesTestMixin
 from extra_views import (
     CreateWithInlinesView,
     UpdateWithInlinesView
@@ -45,11 +45,13 @@ class RequestDetailView(TemplateView):
         commission = service.get_commission(self.kwargs.get('pk'))
         summary = service.get_commission_summary(commission)
         jobs = service.get_jobs_for_commission(commission)
+        is_maker = service.is_commission_maker(commission)
 
         context['request'] = commission
         context['summary'] = summary
         context['jobs'] = jobs
-        
+        context['is_maker'] = is_maker
+
         return context
 
 
@@ -92,6 +94,7 @@ class RequestCreateView(
 class RequestUpdateView(
     LoginRequiredMixin,
     RoleRequiredMixin,
+    UserPassesTestMixin,
     UpdateWithInlinesView
 ):
     required_role = 'CM'
@@ -99,6 +102,10 @@ class RequestUpdateView(
     form_class = CommissionForm
     inlines = [JobUpdateInline]
     template_name = 'commissions/request_form.html'
+
+    def test_func(self):
+        obj = self.get_object()
+        return obj.maker == self.request.user.profile
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

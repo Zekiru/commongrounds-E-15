@@ -1,6 +1,6 @@
 from django.db import transaction
 from django.db.models import Sum, Q
-from django.db.models.functions import Coalesce
+from django.core.exceptions import PermissionDenied
 
 from .models import (
     Commission,
@@ -13,8 +13,64 @@ class CommissionService:
     def __init__(self, user=None):
         self.user = user
 
+    def is_authenticated(self):
+        return self.user is not None and self.user.is_authenticated
+
+    def has_role(self, role):
+        return self.is_authenticated() and self.user.profile.role == role
+
+    def is_commission_maker(self, commission):
+        return (
+            self.is_authenticated() and
+            commission.maker == self.user.profile
+        )
+
     def get_all_commissions(self):
-        return Commission.objects.all()
+        def all_commissions():
+            return {
+                'all': Commission.objects.all().order_by(
+                    'status',
+                    'jobs_status',
+                    '-created_on'
+                )
+            }
+
+        if not self.is_authenticated():
+            return all_commissions()
+
+        created = Commission.objects.filter(
+            maker=self.user.profile
+        ).order_by(
+            'status',
+            'jobs_status',
+            '-created_on'
+        )
+        applied = Commission.objects.filter(
+            jobs__applications__applicant=self.user.profile
+        ).distinct().order_by(
+            'status',
+            'jobs_status',
+            '-created_on'
+        )
+        no_groups = not created.exists() and not applied.exists()
+
+        if no_groups:
+            return all_commissions()
+
+        other = Commission.objects.exclude(
+            Q(maker=self.user.profile) |
+            Q(jobs__applications__applicant=self.user.profile)
+        ).distinct().order_by(
+            'status',
+            'jobs_status',
+            '-created_on'
+        )
+
+        return {
+            'created': created,
+            'applied': applied,
+            'other': other
+        }
 
     def get_commission(self, pk):
         try:
@@ -27,6 +83,15 @@ class CommissionService:
 
     @transaction.atomic
     def create_commission(self, data, jobs_data):
+        if self.is_authenticated() is False:
+            raise PermissionDenied(
+                "User must be authenticated to create a commission."
+            )
+        if self.has_role('CM') is False:
+            raise PermissionDenied(
+                "User does not have permission to create a commission."
+            )
+
         data.pop('maker', None)
         data.pop('job_status', None)
 
@@ -58,6 +123,19 @@ class CommissionService:
         jobs_data,
         jobs_to_delete=None
     ):
+        if self.is_authenticated() is False:
+            raise PermissionDenied(
+                "User must be authenticated to update a commission."
+            )
+        if self.has_role('CM') is False:
+            raise PermissionDenied(
+                "User does not have permission to update a commission."
+            )
+        if self.is_commission_maker(instance) is False:
+            raise PermissionDenied(
+                "User is not the maker of this commission."
+            )
+
         data.pop('maker', None)
         data.pop('job_status', None)
         status = data.pop('status', None)
@@ -112,12 +190,17 @@ class CommissionService:
         return instance
 
     def apply_to_job(self, applicant, job):
+        if self.is_authenticated() is False:
+            raise PermissionDenied(
+                "User must be authenticated to apply to a job."
+            )
+        if self.is_commission_maker(job.commission):
+            raise PermissionDenied(
+                "Commission makers cannot apply to their own jobs."
+            )
+
         invalid_conditions = [
-            # Fix: These hit the db more than neccessary.
-            JobApplication.objects.filter(
-                applicant=applicant, job=job
-            ).exists(),
-            job.commission.status != 0,
+            job.applications.filter(applicant=applicant).exists(),
             job.status != 0
         ]
 
@@ -154,3 +237,25 @@ class CommissionService:
                 (manpower_data['total'] or 0) - (manpower_data['closed'] or 0)
             )
         }
+
+    def application_review_process(self, application, status=0):
+        if application.status != 0:
+            raise PermissionDenied(
+                "Only pending applications can be reviewed."
+            )
+        if status not in [0, 1, 2]:
+            raise ValueError(
+                "Invalid status for application review."
+            )
+
+        if application.status != status:
+            application.status = status
+            application.save()
+
+        if status == 1:
+            job = application.job
+            job.sync_status()
+            job.save()
+            self.sync_commission_status(job.commission)
+
+        return application

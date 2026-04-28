@@ -122,7 +122,7 @@ class Job(models.Model):
     )
 
     def __str__(self):
-        return f"{self.role} Role in {self.commission} Commission"
+        return f"{self.role} in {self.commission}"
 
     def get_status(self):
         return dict(JOB_STATUS).get(

@@ -5,8 +5,10 @@
 {% block content %}
     <div class="row">
         <h2 class="align-left">Commission Request Details</h2>
-        <a class="btn add-btn align-right"
-        href="{% url 'request_update' pk=request.pk %}">Update Request</a>
+        {% if is_maker %}
+            <a class="btn add-btn align-right"
+            href="{% url 'request_update' pk=request.pk %}">Update Request</a>
+        {% endif %}
     </div>
     <hr>
     <h2>{{ request.title }}</h2>
@@ -19,10 +21,10 @@
             <td>{{ summary.status }}</td>
         </tr>
         {% if request.status == 0 %}
-        <!-- <tr>
+        <tr>
             <th>People Required</th>
             <td>{{ request.people_required }}</td>
-        </tr> -->
+        </tr>
         <tr>
             <th>Total Manpower Required</th>
             <td>{{ summary.total_manpower }}</td>

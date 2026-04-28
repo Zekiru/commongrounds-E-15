@@ -42,11 +42,11 @@
     - [x] Should be sorted by status (Pending first, then Accepted, then Rejected), then Applied On, in descending order
 
 ## Views
-- [ ] List View
-    - [ ] List ALL commissions in the system, regardless of poster and status. The commissions should follow this sorting schema:
+- [x] List View
+    - [x] List ALL commissions in the system, regardless of poster and status. The commissions should follow this sorting schema:
         - Status (Open > Full > Completed > Discontinued)
         - Created On, most recent is shown first
-    - [ ] When logged in, there should be groups for the following commission entries, displayed first,  and removed from the All Commissions list:
+    - [x] When logged in, there should be groups for the following commission entries, displayed first,  and removed from the All Commissions list:
         - Commissions the logged-in user has created
         - Commissions the logged-in user has applied to
     - [X] In this view, there should be a link that will lead to the creation of a commission.
@@ -56,7 +56,7 @@
     - [x] A sum of manpower required, and open manpower (difference between sum of manpower and accepted signees) from the jobs should be shown.
     - [ ] When logged in, the “Apply to Job” button to the Job should be open. This is essentially a JobApplication form, similar to the MerchStore Transaction form
     - [ ] When the number of JobApplication entries with “Accepted” status is greater than or equal to the Job’s manpower required, the “Apply to Job” button should not be clickable.
-    - [ ] In this view, if the Commission's owner is the logged-in user, there should be an edit link that will lead to the update view.
+    - [x] In this view, if the Commission's owner is the logged-in user, there should be an edit link that will lead to the update view.
 
 - [x] Create View
     - [x] This view is only available if the Profile has the role “Commission Maker”.
@@ -77,7 +77,7 @@
     - [x] *sync_commission_status(commission)* — checks all related Jobs and sets the commission status to "Full" if all jobs are full; called on every Commission update
     - [x] *get_commission_summary(commission)* — returns a dictionary with total_manpower and open_manpower computed from all related Jobs and their accepted applications
 
-- [ ] All four methods must be used in the appropriate views or signals.
+- [x] All four methods must be used in the appropriate views or signals.
 
 - [x] *create_commission* must use *transaction.atomic()* to ensure the Commission and its Jobs are created together or not at all.
 
