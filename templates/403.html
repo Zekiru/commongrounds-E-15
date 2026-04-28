@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Access Denied | Common Grounds{% endblock %}
+
+{% block styles %}
+<style>
+    .list-item-error {
+        background-color: #fff0f0;
+        border: 1px solid #bf1c1c;
+        border-radius: 15px;
+        padding: 2rem;
+        margin: 1rem 0;
+        text-align: center;
+    }
+    .error-code {
+        font-size: 4rem;
+        color: #aa0a0a;
+        margin-bottom: 0;
+    }
+    .row {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-wrapper-2">
+    <h1 class="error-code">403</h1>
+    <h2>Access Denied</h2>
+    
+    <div class="list-item-error">
+        <h3>Unauthorized Action</h3>
+        <p>You do not have the required permissions to access or modify this record.</p>
+        
+        {% if exception %}
+            <p><i>Reason: {{ exception }}</i></p>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        <a href="/" class="btn align-left">Dashboard</a>
+        <a href="javascript:history.back()" class="btn margin-left align-right">Go Back</a>
+    </div>
+</div>
+{% endblock %}
