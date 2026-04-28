@@ -22,6 +22,9 @@ class CommissionService:
         except Commission.DoesNotExist:
             return None
 
+    def get_jobs_for_commission(self, commission):
+        return commission.jobs.all()
+
     @transaction.atomic
     def create_commission(self, data, jobs_data):
         data.pop('maker', None)
@@ -57,6 +60,10 @@ class CommissionService:
     ):
         data.pop('maker', None)
         data.pop('job_status', None)
+        status = data.pop('status', None)
+
+        if status is not None and instance.set_status(status):
+            instance.save()
 
         for attr, value in data.items():
             setattr(instance, attr, value)
@@ -131,19 +138,19 @@ class CommissionService:
         return False
 
     def get_commission_summary(self, commission):
-        # Fix: Make more concise
+        status = commission.get_status()
+        jobs_status = commission.get_jobs_status()
+
+        manpower_data = commission.jobs.aggregate(
+            total=Sum('manpower_required'),
+            closed=Sum('manpower_required', filter=Q(status=1)),
+        )
+
         return {
-            'pk': commission.pk,
-            'title': commission.title,
-            'type': commission.type.name if commission.type else None,
-            'maker': commission.maker.user.profile,
-            'status': commission.get_status,
-            'jobs_status': commission.get_jobs_status,
-            'people_required': commission.people_required,
-            'total_manpower': Coalesce(
-                Sum('manpower_required'), 0
-            ),
-            'open_manpower': Coalesce(
-                Sum('manpower_required', filter=Q(status=0)), 0
+            'status': status if commission.status != 0 else jobs_status,
+            'total_manpower': manpower_data['total'] or 0,
+            'closed_manpower': manpower_data['closed'] or 0,
+            'open_manpower': (
+                (manpower_data['total'] or 0) - (manpower_data['closed'] or 0)
             )
         }

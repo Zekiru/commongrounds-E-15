@@ -41,9 +41,15 @@ class RequestDetailView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         service = CommissionService(user=self.request.user)
-        context['request'] = service.get_commission(
-            self.kwargs.get('pk')
-        )
+
+        commission = service.get_commission(self.kwargs.get('pk'))
+        summary = service.get_commission_summary(commission)
+        jobs = service.get_jobs_for_commission(commission)
+
+        context['request'] = commission
+        context['summary'] = summary
+        context['jobs'] = jobs
+        
         return context
 
 

@@ -97,8 +97,9 @@ class Commission(models.Model):
             return False
 
         self.status = status
-        self.update_jobs_status()
-        self.jobs.update_status()
+        self.sync_jobs_status()
+        for job in self.jobs.all():
+            job.sync_status()
         return True
 
     class Meta:

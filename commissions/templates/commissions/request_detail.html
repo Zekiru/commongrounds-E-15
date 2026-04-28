@@ -16,18 +16,20 @@
         <tr>
             <th>Status</th>
             
-            <td>
-                {% if request.status != 0 %}
-                    {{ request.get_status }}
-                {% else %}
-                    {{ request.get_jobs_status }}
-                {% endif %}
-            </td>
+            <td>{{ summary.status }}</td>
         </tr>
         {% if request.status == 0 %}
-        <tr>
+        <!-- <tr>
             <th>People Required</th>
             <td>{{ request.people_required }}</td>
+        </tr> -->
+        <tr>
+            <th>Total Manpower Required</th>
+            <td>{{ summary.total_manpower }}</td>
+        </tr>
+        <tr>
+            <th>Job Openings</th>
+            <td>{{ summary.open_manpower }}</td>
         </tr>
         {% endif %}
     </table>
@@ -38,11 +40,35 @@
 
     <h3>Type</h3>
     {% if request.type %}
-    <h4>{{ request.type }}</h4>
-    <p>{{ request.type.description }}</p>
+        <h4>{{ request.type }}</h4>
+        <p>{{ request.type.description }}</p>
     {% else %}
-    <h4>None</h4>
+        <h4>None</h4>
     {% endif %}
+
+    <br><hr>
+    <h2>Jobs</h2>
+    <table>
+    {% for job in jobs %}
+        <tr>
+            <td>
+                <h3>{{ job.role }}</h3>
+                <p>Manpower Required - {{ job.manpower_required }}</p>
+                <p>{{ job.get_status }}</p>
+            </td>
+            
+            {% if job.status == 0 %}
+                <td>
+                    <!-- TODO: Implement application functionality -->
+                    <a class="btn add-btn">Apply</a>
+                </td>
+            {% endif %}
+            
+        </tr>
+    {% empty %}
+        <p>No jobs available.</p>
+    {% endfor %}
+    </table>
 
     <table>
         <tr>
