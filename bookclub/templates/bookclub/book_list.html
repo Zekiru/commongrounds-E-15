@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Club Library{% endblock %}
+
+{% block content %}
+    <h2>Book Club Library</h2>
+    <div class="list-wrapper">
+    {% for book in books %}
+        <div class="list-item">
+            <h3>{{ book.title }}</h3>
+            <p>By <b>{{ book.author }}</b> ({{ book.publication_year }})</p>
+            <p><i>{{ book.genre.name }}</i></p>
+            <a href="{% url 'bookclub:book_detail' book.pk %}"
+            class="btn align-left">
+                View Book
+            </a>
+        </div>
+    {% empty %}
+        <p>No books available.</p>
+    {% endfor %}
+    </div>
+{% endblock %}

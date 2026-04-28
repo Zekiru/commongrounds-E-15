@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Local Event Details{% endblock %}
+
+{% block content %}
+    <h2>Local Event Details</h2>
+    <hr>
+    <h2>{{ event.title }}</h2>
+    <p>{{ event.description }}</p>
+    <br>
+    <h3>Category</h3>
+    {% if event.category %}
+    <h4>{{ event.category.name }}</h4>
+    <p>{{ event.category.description }}</p>
+    {% else %}
+    <h4>None</h4>
+    {% endif %}
+    <table>
+        <tr>
+            <th>Location</th>
+            <td>{{ event.location }}</td>
+        </tr>
+        <tr>
+            <th>Start Time</th>
+            <td>{{ event.start_time }}</td>
+        </tr>
+        <tr>
+            <th>End Time</th>
+            <td>{{ event.end_time }}</td>
+        </tr>
+        <tr>
+            <th>Created On</th>
+            <td>{{ event.created_on }}</td>
+        </tr>
+        <tr>
+            <th>Updated On</th>
+            <td>{{ event.updated_on }}</td>
+        </tr>
+    </table>
+    <a href="{% url 'event_list' %}" class="btn align-right">Back</a>
+{% endblock %}
