@@ -97,9 +97,10 @@
                         View Request
                     </a>
                 </div>
-            {% empty %}
-                <p>No requests available.</p>
             {% endfor %}
+        {% endif %}
+        {% if not requests.all and not requests.other %}
+            <p>No requests available.</p>
         {% endif %}
         <hr>
     </div>
