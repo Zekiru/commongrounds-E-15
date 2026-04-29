@@ -1,5 +1,7 @@
 from django.shortcuts import redirect
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.views.generic import (
+    ListView, DetailView, CreateView, UpdateView
+)
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Product, Transaction
@@ -8,7 +10,7 @@ from .forms import TransactionForm
 
 
 def index(request):
-        return redirect('items/')
+    return redirect('items/')
 
 
 class ProductListView(ListView):
@@ -20,8 +22,12 @@ class ProductListView(ListView):
         context = super().get_context_data(**kwargs)
 
         if self.request.user.is_authenticated:
-            user_products = Product.objects.filter(owner=self.request.user.profile)
-            all_products = Product.objects.exclude(owner=self.request.user.profile).exclude(status="On sale")
+            user_products = Product.objects.filter(
+                owner=self.request.user.profile
+            )
+            all_products = Product.objects.exclude(
+                owner=self.request.user.profile
+            ).exclude(status="On sale")
         else:
             user_products = []
             all_products = Product.objects.all()
@@ -39,14 +45,14 @@ class ProductDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['form'] = TransactionForm()
         return context
-   
+
     def post(self, request, pk):
         product = Product.objects.get(pk=pk)
         form = TransactionForm(request.POST)
 
         if not request.user.is_authenticated:
             return redirect('accounts:login')
-        
+
         if product.owner == request.user.profile:
             return redirect('merchstore_detail', pk=product.pk)
 
@@ -75,19 +81,27 @@ class ProductDetailView(DetailView):
 class ProductCreateView(RoleRequiredMixin, LoginRequiredMixin, CreateView):
     model = Product
     required_role = "MS"
-    template_name = "merchstore/product_create.html"
-    fields = ['name', 'product_type', 'product_image', 'description', 'price', 'stock', 'status']
+    template_name = "merchstore/product_form.html"
+    fields = [
+        'name', 'product_type',
+        'product_image', 'description',
+        'price', 'stock', 'status',
+    ]
 
     def form_valid(self, form):
         form.instance.owner = self.request.user.profile
         return super().form_valid(form)
-   
+
 
 class ProductUpdateView(RoleRequiredMixin, LoginRequiredMixin, UpdateView):
     model = Product
     required_role = "MS"
-    template_name = "merchstore/product_update.html"
-    fields = ['name', 'product_type', 'product_image', 'description', 'price', 'stock', 'status']
+    template_name = "merchstore/product_form.html"
+    fields = [
+        'name', 'product_type',
+        'product_image', 'description',
+        'price', 'stock', 'status',
+    ]
 
     def get_queryset(self):
         return super().get_queryset().filter(owner=self.request.user.profile)
@@ -104,7 +118,7 @@ class ProductUpdateView(RoleRequiredMixin, LoginRequiredMixin, UpdateView):
 
 class CartView(LoginRequiredMixin, ListView):
     model = Transaction
-    template_name = "merchstore/cart_view.html"
+    template_name = "merchstore/cart_list.html"
     context_object_name = "transactions"
 
     def get_queryset(self):
@@ -117,4 +131,6 @@ class TransactionsListView(LoginRequiredMixin, ListView):
     context_object_name = "transactions"
 
     def get_queryset(self):
-        return Transaction.objects.filter(product__owner=self.request.user.profile) #double underscore finds owner in product model
+        return Transaction.objects.filter(
+            product__owner=self.request.user.profile
+        )  # double underscore finds owner in product model

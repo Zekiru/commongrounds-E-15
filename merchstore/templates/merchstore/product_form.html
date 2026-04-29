@@ -1,9 +1,16 @@
 {% extends 'base.html' %}
 
-{% block title %}Update Product{% endblock %}
+{% block title %}
+    {% if object %}Update Product
+    {% else %}Create Product{% endif %}
+
+    {% endblock %}
 
 {% block content %}
-    <h2>Update Product</h2>
+    <h2>
+        {% if object %}Update Product
+        {% else %}Create Product{% endif %}
+    </h2>
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <p>
@@ -34,7 +41,15 @@
             <label>Status:</label><br>
             {{ form.status }}
         </p>
-        <button type="submit">Update Product</button>
+        <button type="submit">
+            {% if object %}Update Product
+            {% else %}Create Product {% endif %}
+        
+        </button>
     </form>
-    <a href="{% url 'merchstore_detail' object.pk %}">Back</a>
+    {% if object %}
+        <a href="{% url 'merchstore_detail' object.pk %}">Back</a>
+    {% else %}
+        <a href="{% url 'merchstore_list' %}">Back</a>
+    {% endif %}
 {% endblock %}

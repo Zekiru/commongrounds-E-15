@@ -2,7 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.core.validators import MinValueValidator
 
-from accounts.models import Profile 
+from accounts.models import Profile
 
 
 class ProductType(models.Model):
@@ -23,20 +23,20 @@ class Product(models.Model):
         max_length=255
     )
     product_type = models.ForeignKey(
-        ProductType, 
-        on_delete = models.SET_NULL, 
+        ProductType,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
     owner = models.ForeignKey(
-        Profile, on_delete = models.CASCADE
+        Profile, on_delete=models.CASCADE
     )
     product_image = models.ImageField(
         upload_to='images/'
     )
     description = models.TextField()
     price = models.DecimalField(
-        max_digits= 10,
+        max_digits=10,
         decimal_places=2
     )
     stock = models.PositiveIntegerField()
@@ -46,9 +46,9 @@ class Product(models.Model):
         ("Out of stock", "Out of stock"),
     ]
     status = models.CharField(
-        max_length = 20,
-        choices = STATUS,
-        default = "Available"
+        max_length=20,
+        choices=STATUS,
+        default="Available"
     )
 
     def __str__(self):
@@ -65,16 +65,17 @@ class Product(models.Model):
         verbose_name = 'product'
         verbose_name_plural = 'products'
 
+
 class Transaction(models.Model):
     buyer = models.ForeignKey(
         Profile,
-        on_delete = models.SET_NULL,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
     product = models.ForeignKey(
         Product,
-        on_delete = models.CASCADE
+        on_delete=models.CASCADE
     )
     amount = models.PositiveIntegerField(
         validators=[MinValueValidator(1)]
@@ -87,8 +88,8 @@ class Transaction(models.Model):
         ("Delivered", "Delivered"),
     ]
     status = models.CharField(
-        max_length = 20,
-        choices = STATUS
+        max_length=20,
+        choices=STATUS
     )
     created_on = models.DateTimeField(
         auto_now_add=True

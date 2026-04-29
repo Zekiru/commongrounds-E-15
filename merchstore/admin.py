@@ -5,6 +5,7 @@ from .models import Product, ProductType, Transaction
 class ProductInLine(admin.TabularInline):
     model = Product
 
+
 class ProductTypeAdmin(admin.ModelAdmin):
     model = ProductType
     list_display = [
@@ -29,6 +30,7 @@ class ProductAdmin(admin.ModelAdmin):
     ]
     ordering = ['name']
 
+
 class TransactionInLine(admin.TabularInline):
     model = Transaction
 
@@ -42,6 +44,7 @@ class TransactionAdmin(admin.ModelAdmin):
         'status',
         'created_on'
     ]
+
 
 admin.site.register(ProductType, ProductTypeAdmin)
 admin.site.register(Product, ProductAdmin)
