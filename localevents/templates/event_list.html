@@ -1,21 +1,58 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Local Events</title>
+</head>
+<body>
+    <h1>Local Events</h1>
 
-{% block title %}Local Events{% endblock %}
+    <p>
+        <a href="{% url 'event_create' %}">Create Event</a>
+    </p>
 
-{% block content %}
-    <h2>List of Events</h2>
-    <div class="list-wrapper">
-    {% for event in events %}
-        <div class="list-item">
-            <h3>{{ event.title }}</h3>
-            <p><i>{{ event.category }}</i></p>
-            <a href="{% url 'event_detail' event.id %}"
-            class="btn align-left">
-                View Event
-            </a>
-        </div>
-    {% empty %}
-        <p>No events available.</p>
-    {% endfor %}
-    </div>
-{% endblock %}
+    {% if user.is_authenticated %}
+        <h2>Events Created</h2>
+        <ul>
+            {% for event in created_events %}
+                <li>
+                    <a href="{% url 'event_detail' event.id %}">
+                        {{ event.title }}
+                    </a>
+                </li>
+            {% empty %}
+                <li>You have not created any events.</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Events Signed Up</h2>
+        <ul>
+            {% for event in signed_up_events %}
+                <li>
+                    <a href="{% url 'event_detail' event.id %}">
+                        {{ event.title }}
+                    </a>
+                </li>
+            {% empty %}
+                <li>You have not signed up for any events.</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <h2>All Events</h2>
+    <ul>
+        {% for event in events %}
+            <li>
+                <a href="{% url 'event_detail' event.id %}">
+                    {{ event.title }}
+                </a>
+            </li>
+        {% empty %}
+            <li>No events yet.</li>
+        {% endfor %}
+    </ul>
+
+    <p>
+        <a href="{% url 'home' %}">Back to Home</a>
+    </p>
+</body>
+</html>

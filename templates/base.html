@@ -4,11 +4,57 @@
 <html lang="en">
 <head>
     <title>{% block title %}Common Grounds{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}"
+    type="text/css">
     {% block styles %}{% endblock %}
 </head>
 <body>
-    <a href="/"><h1>Common Grounds</h1></a>
+    <header>
+        <a href="/"><h1>Common Grounds</h1></a>
+        <hr>
+    </header>
+    <nav>
+        {% if user.is_authenticated %}
+            <div class="nav-left">
+                <p>Welcome, 
+                    <b>{{ user.profile.display_name|default:user.username }}</b>!
+                </p>
+                <p>Role - 
+                    <b>{{ user.profile.get_role_display }}</b>
+                </p>
+            </div>
+            
+            <div class="nav-right">
+                <!-- TO-DO: Add dashboard link -->
+                {% if request.path != '/accounts/'|add:user.username|add:'/' %}
+                <a class="btn"
+                href="/"
+                >Dashboard</a>
+                {% endif %}
+
+                {% if request.path != '/accounts/edit/'|add:user.username|add:'/' %}
+                <a class="btn"
+                href="{% url 'update' user.username %}"
+                >Edit Profile</a>
+                {% endif %}
+
+                <form method="POST" action="{% url 'logout' %}"
+                class="form-btn">
+                    {% csrf_token %}
+                    <button type="submit"
+                    class="logout-btn">Logout</button>
+                </form>
+            </div>
+        {% else %}
+            {% if request.path != '/accounts/login/' %}
+            <div class="nav-mid">
+                <a class="btn"
+                href="{% url 'login' %}">Login</a>
+            </div>
+            {% endif %}
+        {% endif %}
+    </nav>
+    <br>
     <div id="content">
         {% block content %}{% endblock %}
     </div>

@@ -1,41 +1,72 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ event.title }}</title>
+</head>
+<body>
+    <h1>{{ event.title }}</h1>
 
-{% block title %}Local Event Details{% endblock %}
-
-{% block content %}
-    <h2>Local Event Details</h2>
-    <hr>
-    <h2>{{ event.title }}</h2>
-    <p>{{ event.description }}</p>
-    <br>
-    <h3>Category</h3>
-    {% if event.category %}
-    <h4>{{ event.category.name }}</h4>
-    <p>{{ event.category.description }}</p>
-    {% else %}
-    <h4>None</h4>
+    {% if event.event_image %}
+        <img src="{{ event.event_image.url }}" alt="{{ event.title }}" width="300">
     {% endif %}
-    <table>
-        <tr>
-            <th>Location</th>
-            <td>{{ event.location }}</td>
-        </tr>
-        <tr>
-            <th>Start Time</th>
-            <td>{{ event.start_time }}</td>
-        </tr>
-        <tr>
-            <th>End Time</th>
-            <td>{{ event.end_time }}</td>
-        </tr>
-        <tr>
-            <th>Created On</th>
-            <td>{{ event.created_on }}</td>
-        </tr>
-        <tr>
-            <th>Updated On</th>
-            <td>{{ event.updated_on }}</td>
-        </tr>
-    </table>
-    <a href="{% url 'event_list' %}" class="btn align-right">Back</a>
-{% endblock %}
+
+    <p><strong>Category:</strong>
+        {% if event.category %}
+            {{ event.category.name }}
+        {% else %}
+            None
+        {% endif %}
+    </p>
+
+    <p><strong>Description:</strong> {{ event.description }}</p>
+    <p><strong>Location:</strong> {{ event.location }}</p>
+    <p><strong>Start:</strong> {{ event.start_time }}</p>
+    <p><strong>End:</strong> {{ event.end_time }}</p>
+    <p><strong>Status:</strong> {{ event.status }}</p>
+    <p><strong>Capacity:</strong> {{ signup_count }} / {{ event.event_capacity }}</p>
+
+    <p><strong>Organizer:</strong>
+        {% for organizer in event.organizer.all %}
+            {{ organizer.display_name }}
+        {% empty %}
+            None
+        {% endfor %}
+    </p>
+
+    {% if is_organizer %}
+        <p>
+            <a href="{% url 'event_update' event.id %}">Edit Event</a>
+        </p>
+        <p>You cannot sign up for your own event.</p>
+    {% else %}
+        {% if is_full %}
+            <button disabled>Sign Up</button>
+            <p>This event is full.</p>
+        {% else %}
+            {% if user.is_authenticated %}
+                <form method="POST" action="{% url 'event_signup' event.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Sign Up</button>
+                </form>
+            {% else %}
+                <p>
+                    <a href="{% url 'event_signup' event.id %}">Sign Up</a>
+                </p>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+
+    <h2>Signups</h2>
+    <ul>
+        {% for signup in signups %}
+            <li>{{ signup }}</li>
+        {% empty %}
+            <li>No signups yet.</li>
+        {% endfor %}
+    </ul>
+
+    <p>
+        <a href="{% url 'event_list' %}">Back to Events</a>
+    </p>
+</body>
+</html>
