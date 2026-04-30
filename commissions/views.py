@@ -1,5 +1,12 @@
-from django.shortcuts import redirect
-from django.views.generic import TemplateView
+from django.shortcuts import (
+    redirect,
+    get_object_or_404
+)
+from django.core.exceptions import PermissionDenied
+from django.views.generic import (
+    TemplateView,
+    UpdateView
+)
 from django.contrib.auth.mixins import UserPassesTestMixin
 from extra_views import (
     CreateWithInlinesView,
@@ -14,8 +21,10 @@ from .models import (
 )
 from .forms import (
     CommissionForm,
+    JobForm,
     JobCreateInline,
     JobUpdateInline,
+    JobApplicationForm
 )
 from accounts.mixins import RoleRequiredMixin
 from .services import CommissionService
@@ -31,7 +40,16 @@ class RequestListView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         service = CommissionService(user=self.request.user)
-        context['requests'] = service.get_all_commissions()
+        requests = service.get_all_commissions()
+        context['requests'] = requests
+
+        context['has_no_requests'] = not any([
+            requests.get('all'),
+            requests.get('other'),
+            requests.get('created'),
+            requests.get('applied'),
+        ])
+
         return context
 
 
@@ -44,7 +62,7 @@ class RequestDetailView(TemplateView):
 
         commission = service.get_commission(self.kwargs.get('pk'))
         summary = service.get_commission_summary(commission)
-        jobs = service.get_jobs_for_commission(commission)
+        jobs = service.get_categorized_jobs(commission)
         is_maker = service.is_commission_maker(commission)
 
         context['request'] = commission
@@ -53,6 +71,18 @@ class RequestDetailView(TemplateView):
         context['is_maker'] = is_maker
 
         return context
+
+    def post(self, request, *args, **kwargs):
+        job_id = request.POST.get('job_id')
+        job = get_object_or_404(Job, pk=job_id)
+
+        try:
+            service = CommissionService(user=request.user)
+            service.apply_to_job(applicant=request.user.profile, job=job)
+        except Exception as e:
+            raise PermissionDenied(str(e))
+
+        return redirect(job.commission.get_absolute_url())
 
 
 class RequestCreateView(
@@ -133,3 +163,51 @@ class RequestUpdateView(
         except Exception as e:
             form.add_error(None, f"Update Error: {e}")
             return self.forms_invalid(form, inlines)
+
+
+class JobDetailView(
+    LoginRequiredMixin,
+    RoleRequiredMixin,
+    UserPassesTestMixin,
+    UpdateView
+):
+    required_role = 'CM'
+    model = Job
+    form_class = JobApplicationForm
+    template_name = 'commissions/job_detail.html'
+
+    def test_func(self):
+        obj = self.get_object()
+        return obj.commission.maker == self.request.user.profile
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        service = CommissionService(user=self.request.user)
+        job = self.get_object()
+        applications = service.get_applications_for_job(job)
+
+        context['commission'] = job.commission
+        context['job'] = job
+        context['applications'] = applications
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        job = self.get_object()
+        application_id = request.POST.get('application_id')
+        application_status = request.POST.get('application_status')
+        application = get_object_or_404(
+            JobApplication,
+            pk=application_id
+        )
+
+        try:
+            service = CommissionService(user=request.user)
+            service.application_review_process(
+                application=application,
+                status=int(application_status)
+            )
+        except Exception as e:
+            raise PermissionDenied(str(e))
+
+        return redirect(job.get_absolute_url())

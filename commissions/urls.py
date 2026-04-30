@@ -5,6 +5,7 @@ from .views import (
     RequestDetailView,
     RequestCreateView,
     RequestUpdateView,
+    JobDetailView,
 )
 
 urlpatterns = [
@@ -28,5 +29,10 @@ urlpatterns = [
         'request/<int:pk>/update/',
         RequestUpdateView.as_view(),
         name='request_update'
+    ),
+    path(
+        'job/<int:pk>/',
+        JobDetailView.as_view(),
+        name='job_detail'
     ),
 ]

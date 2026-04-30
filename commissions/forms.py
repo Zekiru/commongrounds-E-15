@@ -39,6 +39,18 @@ class JobForm(forms.ModelForm):
             self.fields['status'].disabled = True
 
 
+class JobApplicationForm(forms.ModelForm):
+    class Meta:
+        model = JobApplication
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'status' in self.fields:
+            self.fields['job'].disabled = True
+            self.fields['applicant'].disabled = True
+
+
 class BaseJobFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()

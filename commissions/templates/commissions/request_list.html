@@ -77,6 +77,7 @@
                     </a>
                 </div>
             {% endfor %}
+            <hr>
         {% endif %}
         {% if requests.all %}
             {% for request in requests.all %}
@@ -98,10 +99,11 @@
                     </a>
                 </div>
             {% endfor %}
+            <hr>
         {% endif %}
-        {% if not requests.all and not requests.other %}
+        {% if has_no_requests %}
             <p>No requests available.</p>
+            <hr>
         {% endif %}
-        <hr>
     </div>
 {% endblock %}

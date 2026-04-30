@@ -51,11 +51,11 @@
         - Commissions the logged-in user has applied to
     - [X] In this view, there should be a link that will lead to the creation of a commission.
 
-- [ ] Detail View
+- [x] Detail View
     - [x] This view should show the commission information and the list of Jobs needed for the Commission.
     - [x] A sum of manpower required, and open manpower (difference between sum of manpower and accepted signees) from the jobs should be shown.
-    - [ ] When logged in, the “Apply to Job” button to the Job should be open. This is essentially a JobApplication form, similar to the MerchStore Transaction form
-    - [ ] When the number of JobApplication entries with “Accepted” status is greater than or equal to the Job’s manpower required, the “Apply to Job” button should not be clickable.
+    - [x] When logged in, the “Apply to Job” button to the Job should be open. This is essentially a JobApplication form, similar to the MerchStore Transaction form
+    - [x] When the number of JobApplication entries with “Accepted” status is greater than or equal to the Job’s manpower required, the “Apply to Job” button should not be clickable.
     - [x] In this view, if the Commission's owner is the logged-in user, there should be an edit link that will lead to the update view.
 
 - [x] Create View

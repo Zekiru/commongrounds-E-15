@@ -22,16 +22,12 @@
         </tr>
         {% if request.status == 0 %}
         <tr>
-            <th>People Required</th>
-            <td>{{ request.people_required }}</td>
-        </tr>
-        <tr>
-            <th>Total Manpower Required</th>
-            <td>{{ summary.total_manpower }}</td>
-        </tr>
-        <tr>
-            <th>Job Openings</th>
-            <td>{{ summary.open_manpower }}</td>
+            <th>Manpower Required</th>
+            <td>
+                {{ summary.open_manpower }}
+                /
+                {{ summary.total_manpower }}
+            </td>
         </tr>
         {% endif %}
     </table>
@@ -48,10 +44,34 @@
         <h4>None</h4>
     {% endif %}
 
+    
+    {% if jobs.applied %}
     <br><hr>
-    <h2>Jobs</h2>
+    <h2>Job Applications</h2>
+        <table>
+        {% for job in jobs.applied %}
+            <tr>
+                <td>
+                    <h4>{{ job.role }}</h4>
+                    <p>Manpower Required - {{ job.manpower_required }}</p>
+                    <p>{{ job.get_status }}</p>
+                </td>
+                <td>
+                    <button disabled class="btn"
+                    style="background-color: #ccc; cursor: not-allowed;">
+                        <!-- TO-DO -->
+                        {{ job.user_status }}
+                    </button>
+                </td>
+            </tr>
+        {% endfor %}
+        </table>
+    {% endif %}
+
+    <br><hr>
+    <h2>Job List</h2>
     <table>
-    {% for job in jobs %}
+    {% for job in jobs.not_applied %}
         <tr>
             <td>
                 <h3>{{ job.role }}</h3>
@@ -59,19 +79,46 @@
                 <p>{{ job.get_status }}</p>
             </td>
             
-            {% if job.status == 0 %}
-                <td>
-                    <!-- TODO: Implement application functionality -->
-                    <a class="btn add-btn">Apply</a>
-                </td>
+            <td>
+            {% if user.is_authenticated %}
+                
+                {% if is_maker %}
+  
+                    <a class="btn add-btn"
+                    href="{% url 'job_detail' pk=job.pk %}">
+                        View Details
+                    </a>
+                {% elif job.status == 0 %}
+                    <form method="POST" action="">
+                        {% csrf_token %}
+                        <input type="hidden" name="job_id" value="{{ job.id }}">
+                        <button type="submit" class="add-btn">Apply to Job</button>
+                    </form>
+                {% else %}
+                    <button disabled class="btn"
+                    style="background-color: #ccc; cursor: not-allowed;">
+                            {{ job.get_status }}
+                    </button>
+                {% endif %}
+            {% else %}
+                <button disabled class="btn"
+                    style="background-color: #ccc; cursor: not-allowed;"
+                >
+                    {% if job.status == 0 %}
+                        Login to Apply
+                    {% else %}
+                        {{ job.get_status }}
+                    {% endif %}
+                </button>
             {% endif %}
-            
+            </td>
         </tr>
     {% empty %}
         <p>No jobs available.</p>
     {% endfor %}
     </table>
 
+    <br><hr>
     <table>
         <tr>
             <th>Created On</th>
@@ -83,5 +130,5 @@
         </tr>
     </table>
 
-    <a href="/commissions/requests" class="btn align-right">Back</a>
+    <a href="{% url 'request_list' %}" class="btn align-right">Back</a>
 {% endblock %}

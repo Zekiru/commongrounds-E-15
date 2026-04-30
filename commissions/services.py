@@ -9,6 +9,14 @@ from .models import (
 )
 
 
+class ServiceError(Exception):
+    pass
+
+
+class UnauthorizedAction(ServiceError):
+    pass
+
+
 class CommissionService:
     def __init__(self, user=None):
         self.user = user
@@ -25,6 +33,11 @@ class CommissionService:
             commission.maker == self.user.profile
         )
 
+    def has_applied_to_job(self, job):
+        if not self.is_authenticated():
+            return False
+        return job.applications.filter(applicant=self.user.profile).exists()
+
     def get_all_commissions(self):
         def all_commissions():
             return {
@@ -32,7 +45,7 @@ class CommissionService:
                     'status',
                     'jobs_status',
                     '-created_on'
-                )
+                ),
             }
 
         if not self.is_authenticated():
@@ -69,7 +82,7 @@ class CommissionService:
         return {
             'created': created,
             'applied': applied,
-            'other': other
+            'other': other,
         }
 
     def get_commission(self, pk):
@@ -78,17 +91,49 @@ class CommissionService:
         except Commission.DoesNotExist:
             return None
 
-    def get_jobs_for_commission(self, commission):
-        return commission.jobs.all()
+    def get_categorized_jobs(self, commission):
+        all_jobs = list(Job.objects.filter(commission=commission))
+
+        if not self.user.is_authenticated:
+            return {'applied': [], 'not_applied': all_jobs}
+
+        user_apps = {
+            app.job_id: app.get_status()
+            for app in JobApplication.objects.filter(
+                job__in=all_jobs,
+                applicant=self.user.profile
+            )
+        }
+
+        categorized = {
+            'applied': [],
+            'not_applied': []
+        }
+
+        for job in all_jobs:
+            if job.id in user_apps:
+                job.user_status = user_apps[job.id]
+                categorized['applied'].append(job)
+            else:
+                categorized['not_applied'].append(job)
+
+        return categorized
+
+    def get_applications_for_job(self, job):
+        return JobApplication.objects.filter(
+            job=job
+        ).select_related(
+            'applicant'
+        )
 
     @transaction.atomic
     def create_commission(self, data, jobs_data):
         if self.is_authenticated() is False:
-            raise PermissionDenied(
+            raise UnauthorizedAction(
                 "User must be authenticated to create a commission."
             )
         if self.has_role('CM') is False:
-            raise PermissionDenied(
+            raise UnauthorizedAction(
                 "User does not have permission to create a commission."
             )
 
@@ -124,15 +169,15 @@ class CommissionService:
         jobs_to_delete=None
     ):
         if self.is_authenticated() is False:
-            raise PermissionDenied(
+            raise UnauthorizedAction(
                 "User must be authenticated to update a commission."
             )
         if self.has_role('CM') is False:
-            raise PermissionDenied(
+            raise UnauthorizedAction(
                 "User does not have permission to update a commission."
             )
         if self.is_commission_maker(instance) is False:
-            raise PermissionDenied(
+            raise UnauthorizedAction(
                 "User is not the maker of this commission."
             )
 
@@ -191,11 +236,11 @@ class CommissionService:
 
     def apply_to_job(self, applicant, job):
         if self.is_authenticated() is False:
-            raise PermissionDenied(
+            raise UnauthorizedAction(
                 "User must be authenticated to apply to a job."
             )
         if self.is_commission_maker(job.commission):
-            raise PermissionDenied(
+            raise ServiceError(
                 "Commission makers cannot apply to their own jobs."
             )
 
@@ -238,13 +283,22 @@ class CommissionService:
             )
         }
 
+    def get_user_application_status(self, jobs):
+        if not self.user or self.user.is_anonymous:
+            return []
+
+        return list(JobApplication.objects.filter(
+            job__in=jobs,
+            applicant=self.user.profile
+        ).values_list('job_id', flat=True))
+
     def application_review_process(self, application, status=0):
         if application.status != 0:
-            raise PermissionDenied(
+            raise UnauthorizedAction(
                 "Only pending applications can be reviewed."
             )
         if status not in [0, 1, 2]:
-            raise ValueError(
+            raise ServiceError(
                 "Invalid status for application review."
             )
 

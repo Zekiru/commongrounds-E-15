@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Commission Requests{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <h2 class="align-left">Job Details</h2>
+    </div>
+    <hr>
+    <h2>{{ job }}</h2>
+
+    <table>
+        <tr>
+            <th>Commission</th>
+            <td>{{ job.commission }}</td>
+        </tr>
+        <tr>
+            <th>Role</th>
+            <td>{{ job.role }}</td>
+        </tr>
+        <tr>
+            <th>Manpower Required</th>
+            <td>
+                {{ job.get_accepted_applications_count }}
+                /
+                {{ job.manpower_required }}
+            </td>
+        </tr>
+        <tr>
+            <th>Status</th>
+            <td>{{ job.get_status }}</td>
+        </tr>
+    </table>
+
+    <br><hr>
+
+    <h3>Job Applications</h3>
+    <table>
+    {% for application in applications %}
+        <tr>
+            <td>
+                <h4>Applicant</h4>
+                <p>{{ application.applicant }}</p>
+            </td>
+            {% if application.status == 0 %}
+                <td>
+                    <div class="row">
+                        <form method="POST" action="">
+                            {% csrf_token %}
+                            <input type="hidden"
+                            name="application_id"
+                            value="{{ application.id }}">
+                            <input type="hidden"
+                            name="application_status"
+                            value="1">
+                            <button type="submit"
+                            class="add-btn">
+                                Accept
+                            </button>
+                        </form>
+
+                        <form method="POST" action="">
+                            {% csrf_token %}
+                            <input type="hidden"
+                            name="application_id"
+                            value="{{ application.id }}">
+                            <input type="hidden"
+                            name="application_status"
+                            value="2">
+                            <button type="submit"
+                            class="remove-btn">
+                                Reject
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            {% else %}
+                <td>
+                    <p>{{ application.get_status }}</p>
+                </td>
+            {% endif %}
+        </tr>
+    {% empty %}
+        <tr>
+            <td>No applications yet.</td>
+        </tr>
+    {% endfor %}
+    </table>
+
+    <a href="{% url 'request_detail' pk=commission.pk %}" class="btn align-right">Back</a>
+{% endblock %}
