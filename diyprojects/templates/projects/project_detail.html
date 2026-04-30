@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}DIY Project Details{% endblock %}
+
+{% block content %}
+    <h2>Project Details</h2>
+    <hr>
+    <h2>{{ project.title }}</h2>
+    <p>{{ project.description }}</p>
+    <br>
+    <h3>Category</h3>
+    {% if project.category %}
+    <h4>{{ project.category }}</h4>
+    <p>{{ project.category.description }}</p>
+    {% else %}
+    <h4>None</h4>
+    {% endif %}
+    <br>
+    <h3>Materials</h3>
+    <p>{{ project.materials }}</p>
+    <br>
+    <h3>Steps</h3>
+    <p>{{ project.steps}}</p>
+    <table>
+        <tr>
+            <th>Created On</th>
+            <td>{{ project.created_on }}</td>
+        </tr>
+        <tr>
+            <th>Updated On</th>
+            <td>{{ project.updated_on }}</td>
+        </tr>
+    </table>
+    <a href="/diyprojects/projects" class="btn align-right">Back</a>
+{% endblock %}
