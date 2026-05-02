@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Borrow {{ book.title }}{% endblock %}
+
+{% block content %}
+    <h2 style="text-align: center;"><a href="{% url 'bookclub:book_list' %}">
+        BOOK CLUB LIBRARY
+    </a></h2>
+    <hr>
+
+    <h2>Borrow: <strong>{{ book.title }}</strong></h2>
+
+    <table>
+        <tr>
+            <th>Genre</th>
+            <td>{{ book.genre }}</td>
+        </tr>
+        <tr>
+            <th>Author</th>
+            <td>{{ book.author }}</td>
+        </tr>
+        <tr>
+            <th>Published</th>
+            <td>{{ book.publication_year }}</td>
+        </tr>
+        <tr>
+            <th>Synopsis</th>
+            <td>{{ book.synopsis }}</td>
+        </tr>
+    </table>
+
+    <form method="post" class="form-container">
+        {% csrf_token %}
+        
+    
+        <div style="align-items: center;">
+            <label for="id_name" style="font-weight: bold;">Your Name:</label>
+            {{ form.name }}
+        </div>
+
+        <div style="gap: 10px; margin: 20px 0; align-items: center;">
+            <label for="id_date_borrowed" style="font-weight: bold;">Date Borrowed:</label>
+            {{ form.date_borrowed }}
+            <button type="submit" name="calculate">
+                See Return Date
+            </button>
+        </div>
+
+        {% if date_to_return %}
+            <div style="margin-bottom: 25px; padding: 15px; background-color: rgb(199, 225, 252); align-items: center;">
+                <i>Please return the book in two weeks.</i>
+                Borrowed on: {{ selected_date|date:"F j, Y" }}
+                <strong>Return by: {{ date_to_return|date:"F j, Y" }}</strong>
+            </div>
+        {% endif %}
+
+        <hr>
+
+        <div class="form-actions" style="gap: 10px; margin: 20px 0; align-items: center;">
+            {% if book.available_to_borrow %}
+                <button type="submit" class="btn">Borrow Book</button>
+            {% else %}
+                <button type="button" class="btn" style="background-color: #ccc;" disabled>
+                    Currently Checked Out
+                </button>
+            {% endif %}
+            <a href="{% url 'bookclub:book_detail' book.pk %}" class="btn secondary">Cancel</a>
+        </div>
+    </form>
+{% endblock%}
