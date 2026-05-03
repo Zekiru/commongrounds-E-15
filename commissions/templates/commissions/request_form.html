@@ -21,6 +21,19 @@
                 
                 {{ inline.management_form }}
 
+                {% if inline.non_form_errors %}
+                    <div class="alert alert-danger errorlist">
+                        {% for error in inline.non_form_errors %}
+                            <p style="
+                            color: darkred;
+                            margin: 0 auto;
+                            ">
+                                {{ error }}
+                            </p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
                 <div id="jobs-container">
                     {% for job_form in inline %}
                         <div class="job-form-row">
@@ -59,7 +72,7 @@
         </form>
     </div>
 
-    {% if object %}
+    {% if object.pk %}
         <a href="{% url 'request_detail' object.pk %}" class="align-right btn">
             Back to Details
         </a>
@@ -73,9 +86,6 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-    // This JavaScript remains completely identical to the previous version!
-    // Because extra-views generates standard Django formsets, our script 
-    // dynamically finds the correct prefix and management forms automatically.
 
     const addBtn = document.getElementById('add-job-btn');
     const container = document.getElementById('jobs-container');
@@ -84,7 +94,7 @@
     const totalForms = document.querySelector('input[name$="-TOTAL_FORMS"]');
     const formPrefix = totalForms.name.replace('-TOTAL_FORMS', '');
 
-    // --- ADD FORM LOGIC ---
+    // ADD FORM LOGIC
     addBtn.addEventListener('click', function(e) {
         e.preventDefault();
         const currentFormCount = parseInt(totalForms.value);
@@ -94,7 +104,7 @@
         totalForms.value = currentFormCount + 1;
     });
 
-    // --- REMOVE FORM LOGIC ---
+    // REMOVE FORM LOGIC
     container.addEventListener('click', function(e) {
         if (e.target.classList.contains('remove-btn')) {
             e.preventDefault();
@@ -111,7 +121,7 @@
         }
     });
 
-    // --- RE-INDEXING LOGIC ---
+    // RE-INDEXING LOGIC
     function updateFormIndexes() {
         const rows = container.querySelectorAll('.job-form-row');
         const regex = new RegExp(`${formPrefix}-\\d+`);

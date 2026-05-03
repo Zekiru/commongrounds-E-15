@@ -34,21 +34,19 @@ def index(request):
     return redirect('requests/')
 
 
+class MakerOnlyMixin:
+    def is_maker(self, commission):
+        return self.request.user.profile == commission.maker
+
+
 class RequestListView(TemplateView):
     template_name = 'commissions/request_list.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         service = CommissionService(user=self.request.user)
-        requests = service.get_all_commissions()
-        context['requests'] = requests
 
-        context['has_no_requests'] = not any([
-            requests.get('all'),
-            requests.get('other'),
-            requests.get('created'),
-            requests.get('applied'),
-        ])
+        context['requests'] = service.get_all_commissions()
 
         return context
 
@@ -61,23 +59,20 @@ class RequestDetailView(TemplateView):
         service = CommissionService(user=self.request.user)
 
         commission = service.get_commission(self.kwargs.get('pk'))
-        summary = service.get_commission_summary(commission)
-        jobs = service.get_categorized_jobs(commission)
-        is_maker = service.is_commission_maker(commission)
 
         context['request'] = commission
-        context['summary'] = summary
-        context['jobs'] = jobs
-        context['is_maker'] = is_maker
+        context['summary'] = service.get_commission_summary(commission)
+        context['jobs'] = service.get_jobs_of_commission(commission)
+        context['is_maker'] = service.is_maker_of_commission(commission)
 
         return context
 
     def post(self, request, *args, **kwargs):
         job_id = request.POST.get('job_id')
         job = get_object_or_404(Job, pk=job_id)
+        service = CommissionService(user=request.user)
 
         try:
-            service = CommissionService(user=request.user)
             service.apply_to_job(applicant=request.user.profile, job=job)
         except Exception as e:
             raise PermissionDenied(str(e))
@@ -102,11 +97,10 @@ class RequestCreateView(
         return kwargs
 
     def forms_valid(self, form, inlines):
+        service = CommissionService(user=self.request.user)
         job_formset = inlines[0]
 
         try:
-            service = CommissionService(user=self.request.user)
-
             commission_data = form.cleaned_data
             jobs_data = job_formset.get_jobs_data()
 
@@ -117,6 +111,7 @@ class RequestCreateView(
 
             return redirect(self.object)
         except Exception as e:
+            print(f"DEBUG: Error caught in view: {e}")
             form.add_error(None, f"Service Error: {e}")
             return self.forms_invalid(form, inlines)
 
@@ -124,6 +119,7 @@ class RequestCreateView(
 class RequestUpdateView(
     LoginRequiredMixin,
     RoleRequiredMixin,
+    MakerOnlyMixin,
     UserPassesTestMixin,
     UpdateWithInlinesView
 ):
@@ -134,8 +130,10 @@ class RequestUpdateView(
     template_name = 'commissions/request_form.html'
 
     def test_func(self):
-        obj = self.get_object()
-        return obj.maker == self.request.user.profile
+        return (
+            self.has_required_role() and
+            self.is_maker(self.get_object())
+        )
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -143,10 +141,10 @@ class RequestUpdateView(
         return kwargs
 
     def forms_valid(self, form, inlines):
+        service = CommissionService(user=self.request.user)
         job_formset = inlines[0]
 
         try:
-            service = CommissionService(user=self.request.user)
             instance = self.get_object()
             commission_data = form.cleaned_data
             jobs_data = job_formset.get_jobs_data()
@@ -161,13 +159,14 @@ class RequestUpdateView(
 
             return redirect(self.object)
         except Exception as e:
-            form.add_error(None, f"Update Error: {e}")
+            form.add_error(None, f"Service Error: {e}")
             return self.forms_invalid(form, inlines)
 
 
 class JobDetailView(
     LoginRequiredMixin,
     RoleRequiredMixin,
+    MakerOnlyMixin,
     UserPassesTestMixin,
     UpdateView
 ):
@@ -177,22 +176,26 @@ class JobDetailView(
     template_name = 'commissions/job_detail.html'
 
     def test_func(self):
-        obj = self.get_object()
-        return obj.commission.maker == self.request.user.profile
+        return (
+            self.has_required_role() and
+            self.is_maker(self.get_object().commission)
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         service = CommissionService(user=self.request.user)
         job = self.get_object()
-        applications = service.get_applications_for_job(job)
 
         context['commission'] = job.commission
         context['job'] = job
-        context['applications'] = applications
+        context['applications'] = service.get_applications_of_job(job)
+        context['summary'] = service.get_job_summary(job)
 
         return context
 
     def post(self, request, *args, **kwargs):
+        service = CommissionService(user=request.user)
+
         job = self.get_object()
         application_id = request.POST.get('application_id')
         application_status = request.POST.get('application_status')
@@ -202,7 +205,6 @@ class JobDetailView(
         )
 
         try:
-            service = CommissionService(user=request.user)
             service.application_review_process(
                 application=application,
                 status=int(application_status)

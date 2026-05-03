@@ -148,9 +148,6 @@ class Job(models.Model):
 
         return False
 
-    def get_accepted_applications_count(self):
-        return self.applications.filter(status=1).count()
-
     def get_absolute_url(self):
         return reverse('job_detail', kwargs={'pk': self.pk})
 

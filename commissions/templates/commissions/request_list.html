@@ -11,99 +11,41 @@
         {% endif %}
     </div>
     <div class="list-wrapper">
-        {% if requests.created %}
-            <h2>Created Requests</h2>
-            {% for request in requests.created %}
-                <div class="list-item">
-                    <h3>{{ request.title }}</h3>
-                    <p>
-                        {% if request.status != 0 %}
-                            {{ request.get_status }}
-                        {% else %}
-                            {{ request.get_jobs_status }}
-                        {% endif %}
-                    </p>
-                    <p><i>{{ request.type }}</i></p>
-
-                    <a href="{{ request.get_absolute_url }}"
-                    class="btn align-left">
-                        View Request
-                    </a>
-                </div>
-            {% endfor %}
-            <hr>
-        {% endif %}
-        {% if requests.applied %}
-            <h2>Applied Requests</h2>
-            {% for request in requests.applied %}
-                <div class="list-item">
-                    <h3>{{ request.title }}</h3>
-                    <p>By {{ request.maker }}</p>
-                    <p>
-                        {% if request.status != 0 %}
-                            {{ request.get_status }}
-                        {% else %}
-                            {{ request.get_jobs_status }}
-                        {% endif %}
-                    </p>
-                    <p><i>{{ request.type }}</i></p>
-
-                    <a href="{{ request.get_absolute_url }}"
-                    class="btn align-left">
-                        View Request
-                    </a>
-                </div>
-            {% endfor %}
-            <hr>
-        {% endif %}
-        {% if requests.other %}
-                <h2>Other Requests</h2>
-            {% for request in requests.other %}
-                <div class="list-item">
-                    <h3>{{ request.title }}</h3>
-                    <p>By {{ request.maker }}</p>
-                    <p>
-                        {% if request.status != 0 %}
-                            {{ request.get_status }}
-                        {% else %}
-                            {{ request.get_jobs_status }}
-                        {% endif %}
-                    </p>
-                    <p><i>{{ request.type }}</i></p>
-
-                    <a href="{{ request.get_absolute_url }}"
-                    class="btn align-left">
-                        View Request
-                    </a>
-                </div>
-            {% endfor %}
-            <hr>
-        {% endif %}
-        {% if requests.all %}
-            {% for request in requests.all %}
-                <div class="list-item">
-                    <h3>{{ request.title }}</h3>
-                    <p>By {{ request.maker }}</p>
-                    <p>
-                        {% if request.status != 0 %}
-                            {{ request.get_status }}
-                        {% else %}
-                            {{ request.get_jobs_status }}
-                        {% endif %}
-                    </p>
-                    <p><i>{{ request.type }}</i></p>
-
-                    <a href="{{ request.get_absolute_url }}"
-                    class="btn align-left">
-                        View Request
-                    </a>
-                </div>
-            {% endfor %}
-            <hr>
-        {% endif %}
-        {% if has_no_requests %}
-            <p>No requests available.</p>
-            <hr>
-        {% endif %}
+        {% for category, queryset in requests.items %}
+            {% if queryset %}
+                {% if category == 'created' %}
+                    <h2>Created Requests</h2>
+                {% elif category == 'applied' %}
+                    <h2>Applied Requests</h2>
+                {% elif requests|length > 1 %}
+                    <h2>Other Requests</h2>
+                {% endif %}
+                {% for request in queryset %}
+                    <!-- for each individual commission request: -->
+                    <div class="list-item">
+                        <h3>{{ request.title }}</h3>
+                        <p>By {{ request.maker }}</p>
+                        <p>
+                            {% if request.status != 0 %}
+                                {{ request.get_status }}
+                            {% else %}
+                                {{ request.get_jobs_status }}
+                            {% endif %}
+                        </p>
+                        
+                        <div class="row">
+                            <p class="align-left"><i>{{ request.type }}</i></p>
+                            <a href="{{ request.get_absolute_url }}"
+                            class="btn align-right">
+                                View Request
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+                <hr>
+            {% endif %}
+        {% empty %}
+            <p>No requests available.</p><hr>
+        {% endfor %}
     </div>
 {% endblock %}

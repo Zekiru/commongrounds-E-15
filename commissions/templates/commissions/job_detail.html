@@ -19,9 +19,9 @@
             <td>{{ job.role }}</td>
         </tr>
         <tr>
-            <th>Manpower Required</th>
+            <th>Total Manpower</th>
             <td>
-                {{ job.get_accepted_applications_count }}
+                {{ summary.accepted }}
                 /
                 {{ job.manpower_required }}
             </td>
@@ -32,9 +32,29 @@
         </tr>
     </table>
 
+    <h3>Summary</h3>
+    <table>
+        <tr>
+            <th>Pending</th>
+            <th>Accepted</th>
+            <th>Rejected</th>
+        </tr>
+        <tr>
+            <td style="text-align: center;">
+                {{ summary.pending }}
+            </td>
+            <td style="text-align: center;">
+                {{ summary.accepted }}
+            </td>
+            <td style="text-align: center;">
+                {{ summary.rejected }}
+            </td>
+        </tr>
+    </table>
+
     <br><hr>
 
-    <h3>Job Applications</h3>
+    <h2>Job Applications</h2>
     <table>
     {% for application in applications %}
         <tr>

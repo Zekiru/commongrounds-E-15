@@ -1,5 +1,5 @@
 from django.db import transaction
-from django.db.models import Sum, Q
+from django.db.models import Count, Sum, Q
 from django.core.exceptions import PermissionDenied
 
 from .models import (
@@ -13,7 +13,7 @@ class ServiceError(Exception):
     pass
 
 
-class UnauthorizedAction(ServiceError):
+class UnauthorizedAction(PermissionDenied, ServiceError):
     pass
 
 
@@ -22,68 +22,76 @@ class CommissionService:
         self.user = user
 
     def is_authenticated(self):
-        return self.user is not None and self.user.is_authenticated
+        return self.user and self.user.is_authenticated
 
-    def has_role(self, role):
-        return self.is_authenticated() and self.user.profile.role == role
-
-    def is_commission_maker(self, commission):
-        return (
-            self.is_authenticated() and
-            commission.maker == self.user.profile
-        )
-
-    def has_applied_to_job(self, job):
+    def is_maker_of_commission(self, commission):
         if not self.is_authenticated():
             return False
-        return job.applications.filter(applicant=self.user.profile).exists()
+        return commission.maker == self.user.profile
+
+    def check_authentication(self):
+        if not self.is_authenticated():
+            raise UnauthorizedAction(
+                "User must be authenticated for this action."
+            )
+
+    def check_required_role(self):
+        self.check_authentication()
+        if not self.user.profile.role == 'CM':
+            raise UnauthorizedAction(
+                "User does not have the required role for this action."
+            )
+
+    def check_maker_of_commission(self, commission):
+        self.check_authentication()
+        if not self.is_maker_of_commission(commission):
+            raise UnauthorizedAction(
+                "User must be the maker of this commission for this action."
+            )
+
+    def check_matching_total_manpower(self, data, jobs_data):
+        commission_total = data.get('people_required', 0)
+        job_total = 0
+        for jd in jobs_data:
+            job_total += jd.get('manpower_required', 0)
+        if job_total != commission_total:
+            raise ServiceError(
+                "People Required does not match Total Job Manpower."
+            )
 
     def get_all_commissions(self):
-        def all_commissions():
-            return {
-                'all': Commission.objects.all().order_by(
-                    'status',
-                    'jobs_status',
-                    '-created_on'
-                ),
-            }
+        order = ['status', 'jobs_status', '-created_on']
+
+        all_commissions = Commission.objects.all()
+        if not all_commissions.exists():
+            return {}
 
         if not self.is_authenticated():
-            return all_commissions()
+            return {'all': all_commissions.order_by(*order)}
 
         created = Commission.objects.filter(
             maker=self.user.profile
-        ).order_by(
-            'status',
-            'jobs_status',
-            '-created_on'
-        )
+        ).order_by(*order)
         applied = Commission.objects.filter(
             jobs__applications__applicant=self.user.profile
-        ).distinct().order_by(
-            'status',
-            'jobs_status',
-            '-created_on'
-        )
-        no_groups = not created.exists() and not applied.exists()
-
-        if no_groups:
-            return all_commissions()
-
+        ).distinct().order_by(*order)
         other = Commission.objects.exclude(
             Q(maker=self.user.profile) |
             Q(jobs__applications__applicant=self.user.profile)
-        ).distinct().order_by(
-            'status',
-            'jobs_status',
-            '-created_on'
-        )
+        ).distinct().order_by(*order)
 
-        return {
-            'created': created,
-            'applied': applied,
-            'other': other,
-        }
+        commissions = {}
+
+        if created.exists():
+            commissions['created'] = created
+
+        if applied.exists():
+            commissions['applied'] = applied
+
+        if other.exists():
+            commissions['all'] = other
+
+        return commissions
 
     def get_commission(self, pk):
         try:
@@ -91,35 +99,44 @@ class CommissionService:
         except Commission.DoesNotExist:
             return None
 
-    def get_categorized_jobs(self, commission):
-        all_jobs = list(Job.objects.filter(commission=commission))
+    def get_jobs_of_commission(self, commission):
+        all_jobs = Job.objects.filter(commission=commission).annotate(
+            p_count=Count('applications', filter=Q(applications__status=0)),
+            a_count=Count('applications', filter=Q(applications__status=1)),
+            r_count=Count('applications', filter=Q(applications__status=2))
+        )
 
-        if not self.user.is_authenticated:
-            return {'applied': [], 'not_applied': all_jobs}
+        category = {'applied': [], 'not_applied': []}
 
-        user_apps = {
-            app.job_id: app.get_status()
-            for app in JobApplication.objects.filter(
-                job__in=all_jobs,
-                applicant=self.user.profile
-            )
-        }
-
-        categorized = {
-            'applied': [],
-            'not_applied': []
-        }
+        user_apps = {}
+        if self.is_authenticated():
+            user_apps = {
+                app.job_id: app.get_status()
+                for app in JobApplication.objects.filter(
+                    job__in=all_jobs,
+                    applicant=self.user.profile
+                )
+            }
 
         for job in all_jobs:
-            if job.id in user_apps:
+            job.app_counts = {
+                'pending': job.p_count,
+                'accepted': job.a_count,
+                'rejected': job.r_count,
+            }
+            job.opening_count = (
+                job.manpower_required - job.app_counts['accepted']
+            )
+
+            if self.is_authenticated() and job.id in user_apps:
                 job.user_status = user_apps[job.id]
-                categorized['applied'].append(job)
+                category['applied'].append(job)
             else:
-                categorized['not_applied'].append(job)
+                category['not_applied'].append(job)
 
-        return categorized
+        return category
 
-    def get_applications_for_job(self, job):
+    def get_applications_of_job(self, job):
         return JobApplication.objects.filter(
             job=job
         ).select_related(
@@ -128,14 +145,12 @@ class CommissionService:
 
     @transaction.atomic
     def create_commission(self, data, jobs_data):
-        if self.is_authenticated() is False:
-            raise UnauthorizedAction(
-                "User must be authenticated to create a commission."
-            )
-        if self.has_role('CM') is False:
-            raise UnauthorizedAction(
-                "User does not have permission to create a commission."
-            )
+        self.check_authentication()
+        self.check_required_role()
+        self.check_matching_total_manpower(
+            data=data,
+            jobs_data=jobs_data
+        )
 
         data.pop('maker', None)
         data.pop('job_status', None)
@@ -168,18 +183,13 @@ class CommissionService:
         jobs_data,
         jobs_to_delete=None
     ):
-        if self.is_authenticated() is False:
-            raise UnauthorizedAction(
-                "User must be authenticated to update a commission."
-            )
-        if self.has_role('CM') is False:
-            raise UnauthorizedAction(
-                "User does not have permission to update a commission."
-            )
-        if self.is_commission_maker(instance) is False:
-            raise UnauthorizedAction(
-                "User is not the maker of this commission."
-            )
+        self.check_authentication()
+        self.check_required_role()
+        self.check_maker_of_commission(instance)
+        self.check_matching_total_manpower(
+            data=data,
+            jobs_data=jobs_data
+        )
 
         data.pop('maker', None)
         data.pop('job_status', None)
@@ -235,11 +245,8 @@ class CommissionService:
         return instance
 
     def apply_to_job(self, applicant, job):
-        if self.is_authenticated() is False:
-            raise UnauthorizedAction(
-                "User must be authenticated to apply to a job."
-            )
-        if self.is_commission_maker(job.commission):
+        self.check_authentication()
+        if self.is_maker_of_commission(job.commission):
             raise ServiceError(
                 "Commission makers cannot apply to their own jobs."
             )
@@ -269,19 +276,29 @@ class CommissionService:
         status = commission.get_status()
         jobs_status = commission.get_jobs_status()
 
-        manpower_data = commission.jobs.aggregate(
-            total=Sum('manpower_required'),
-            closed=Sum('manpower_required', filter=Q(status=1)),
-        )
+        total_req = commission.jobs.aggregate(
+            total=Sum('manpower_required')
+        )['total'] or 0
+
+        total_accepted = commission.jobs.aggregate(
+            accepted=Count('applications', filter=Q(applications__status=1))
+        )['accepted'] or 0
 
         return {
             'status': status if commission.status != 0 else jobs_status,
-            'total_manpower': manpower_data['total'] or 0,
-            'closed_manpower': manpower_data['closed'] or 0,
-            'open_manpower': (
-                (manpower_data['total'] or 0) - (manpower_data['closed'] or 0)
-            )
+            'total_manpower': total_req,
+            'closed_manpower': total_accepted,
+            'open_manpower': max(0, total_req - total_accepted)
         }
+
+    def get_job_summary(self, job):
+        apps_data = job.applications.aggregate(
+            pending=Count('id', filter=Q(status=0)),
+            accepted=Count('id', filter=Q(status=1)),
+            rejected=Count('id', filter=Q(status=2))
+        )
+
+        return apps_data
 
     def get_user_application_status(self, jobs):
         if not self.user or self.user.is_anonymous:
