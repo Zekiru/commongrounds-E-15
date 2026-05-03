@@ -21,7 +21,6 @@ from .models import (
 )
 from .forms import (
     CommissionForm,
-    JobForm,
     JobCreateInline,
     JobUpdateInline,
     JobApplicationForm
@@ -31,7 +30,7 @@ from .services import CommissionService
 
 
 def index(request):
-    return redirect('requests/')
+    return redirect('request_list')
 
 
 class MakerOnlyMixin:

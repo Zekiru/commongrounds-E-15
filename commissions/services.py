@@ -17,10 +17,7 @@ class UnauthorizedAction(PermissionDenied, ServiceError):
     pass
 
 
-class CommissionService:
-    def __init__(self, user=None):
-        self.user = user
-
+class CommissionValidator:
     def is_authenticated(self):
         return self.user and self.user.is_authenticated
 
@@ -59,6 +56,8 @@ class CommissionService:
                 "People Required does not match Total Job Manpower."
             )
 
+
+class CommissionFetcher:
     def get_all_commissions(self):
         order = ['status', 'jobs_status', '-created_on']
 
@@ -142,6 +141,11 @@ class CommissionService:
         ).select_related(
             'applicant'
         )
+
+
+class CommissionService(CommissionValidator, CommissionFetcher):
+    def __init__(self, user=None):
+        self.user = user
 
     @transaction.atomic
     def create_commission(self, data, jobs_data):
@@ -299,15 +303,6 @@ class CommissionService:
         )
 
         return apps_data
-
-    def get_user_application_status(self, jobs):
-        if not self.user or self.user.is_anonymous:
-            return []
-
-        return list(JobApplication.objects.filter(
-            job__in=jobs,
-            applicant=self.user.profile
-        ).values_list('job_id', flat=True))
 
     def application_review_process(self, application, status=0):
         if application.status != 0:

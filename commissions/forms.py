@@ -2,7 +2,6 @@ from django import forms
 from extra_views import InlineFormSetFactory
 from django.forms import (
     BaseInlineFormSet,
-    inlineformset_factory
 )
 
 from .models import (
