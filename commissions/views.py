@@ -110,7 +110,6 @@ class RequestCreateView(
 
             return redirect(self.object)
         except Exception as e:
-            print(f"DEBUG: Error caught in view: {e}")
             form.add_error(None, f"Service Error: {e}")
             return self.forms_invalid(form, inlines)
 
