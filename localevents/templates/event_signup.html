@@ -1,24 +1,52 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Event Signup</title>
-</head>
-<body>
-    <h1>Sign Up for {{ event.title }}</h1>
+{% extends 'base.html' %}
 
-    <p><strong>Description:</strong> {{ event.description }}</p>
-    <p><strong>Location:</strong> {{ event.location }}</p>
-    <p><strong>Start:</strong> {{ event.start_time }}</p>
-    <p><strong>End:</strong> {{ event.end_time }}</p>
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto; padding: 40px 60px;">
+
+    <div style="text-align: center; margin-bottom: 35px;">
+        <h2 style="font-weight: normal; color: #1e90ff; letter-spacing: 1px;">
+            EVENT SIGNUP
+        </h2>
+    </div>
+
+    <hr>
+
+    <h2 style="font-weight: normal; margin-top: 40px;">{{ event.title }}</h2>
+
+    <table style="width: 100%; border-collapse: collapse; margin-top: 25px;">
+        <tr>
+            <td style="border: 1px solid #ccc; padding: 15px;"><strong>Description</strong></td>
+            <td style="border: 1px solid #ccc; padding: 15px;">{{ event.description }}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #ccc; padding: 15px;"><strong>Location</strong></td>
+            <td style="border: 1px solid #ccc; padding: 15px;">{{ event.location }}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #ccc; padding: 15px;"><strong>Start</strong></td>
+            <td style="border: 1px solid #ccc; padding: 15px;">{{ event.start_time }}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #ccc; padding: 15px;"><strong>End</strong></td>
+            <td style="border: 1px solid #ccc; padding: 15px;">{{ event.end_time }}</td>
+        </tr>
+    </table>
+
+    <h3 style="font-weight: normal; margin-top: 35px;">Sign Up</h3>
 
     <form method="POST">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Sign Up</button>
+
+        <button type="submit"
+            style="background-color: #3498db; color: white; padding: 12px 30px; border: none; border-radius: 4px;">
+            Submit Signup
+        </button>
     </form>
 
-    <p>
+    <p style="margin-top: 30px;">
         <a href="{% url 'event_detail' event.id %}">Back to Event</a>
     </p>
-</body>
-</html>
+
+</div>
+{% endblock %}
