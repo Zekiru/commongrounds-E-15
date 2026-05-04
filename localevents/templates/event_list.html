@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Local Events{% endblock %}
+
+{% block content %}
+    <h2>List of Events</h2>
+    <div class="list-wrapper">
+    {% for event in events %}
+        <div class="list-item">
+            <h3>{{ event.title }}</h3>
+            <p><i>{{ event.category }}</i></p>
+            <a href="{% url 'event_detail' event.id %}"
+            class="btn align-left">
+                View Event
+            </a>
+        </div>
+    {% empty %}
+        <p>No events available.</p>
+    {% endfor %}
+    </div>
+{% endblock %}

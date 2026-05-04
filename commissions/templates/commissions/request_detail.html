@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Commission Request Details{% endblock %}
+
+{% block content %}
+    <h2>Commission Request Details</h2>
+    <hr>
+    <h2>{{ request.title }}</h2>
+    <p>{{ request.description }}</p>
+    <br>
+    <h3>Type</h3>
+    {% if request.commission_type %}
+    <h4>{{ request.commission_type }}</h4>
+    <p>{{ request.commission_type.description }}</p>
+    {% else %}
+    <h4>None</h4>
+    {% endif %}
+    <table>
+        <tr>
+            <th>People Required</th>
+            <td>{{ request.people_required }}</td>
+        </tr>
+        <tr>
+            <th>Created On</th>
+            <td>{{ request.created_on }}</td>
+        </tr>
+        <tr>
+            <th>Updated On</th>
+            <td>{{ request.updated_on }}</td>
+        </tr>
+    </table>
+    <a href="/commissions/requests" class="btn align-right">Back</a>
+{% endblock %}
