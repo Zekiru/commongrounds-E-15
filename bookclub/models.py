@@ -1,6 +1,7 @@
 from django.db import models
 from accounts.models import Profile
 
+
 class BookCategory(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
