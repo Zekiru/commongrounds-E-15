@@ -4,6 +4,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from .models import Profile
 
+admin.site.register(Profile)
 
 class ProfileInline(admin.StackedInline):
     model = Profile
