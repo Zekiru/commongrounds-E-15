@@ -3,9 +3,69 @@
 {% block title %}Book Club Library{% endblock %}
 
 {% block content %}
-    <h2>Book Club Library</h2>
+    <h2 style="text-align: center;">BOOK CLUB LIBRARY</h2>
+    <a href="{% url 'bookclub:book_add' %}" class="btn align-center" style="margin: 1px auto;">
+        Add New Book
+    </a>
+    <hr>
+    {% if user.is_authenticated %}
+        {% if books_contributed %}
+            <h3>Books You Contributed</h3>
+            <div class="list-wrapper">
+            {% for book in books_contributed %}
+                <div class="list-item">
+                    <h3>{{ book.title }}</h3>
+                    <p>By <b>{{ book.author }}</b> ({{ book.publication_year }})</p>
+                    <p><i>{{ book.genre.name }}</i></p>
+                    <a href="{% url 'bookclub:book_detail' book.pk %}"
+                    class="btn align-left">
+                        View Book
+                    </a>
+                </div>
+            {% endfor%}
+            </div>
+        {% endif %}
+        
+
+        {% if books_bookmarked %}
+            <h3>Books You Bookmarked</h3>
+            <div class="list-wrapper">
+            {% for book in books_bookmarked %}
+                <div class="list-item">
+                    <h3>{{ book.title }}</h3>
+                    <p>By <b>{{ book.author }}</b> ({{ book.publication_year }})</p>
+                    <p><i>{{ book.genre.name }}</i></p>
+                    <a href="{% url 'bookclub:book_detail' book.pk %}"
+                    class="btn align-left">
+                        View Book
+                    </a>
+                </div>
+            {% endfor%}
+            </div>
+        {% endif %}
+        
+
+        {% if books_reviewed %}
+            <h3>Books You Reviewed</h3>
+            <div class="list-wrapper">
+            {% for book in books_reviewed %}
+                <div class="list-item">
+                    <h3>{{ book.title }}</h3>
+                    <p>By <b>{{ book.author }}</b> ({{ book.publication_year }})</p>
+                    <p><i>{{ book.genre.name }}</i></p>
+                    <a href="{% url 'bookclub:book_detail' book.pk %}"
+                    class="btn align-left">
+                        View Book
+                    </a>
+                </div>
+            {% endfor %}
+            </div>
+        {% endif %}
+    {% endif %}
+    
+    <h3>All Books</h3>
     <div class="list-wrapper">
-    {% for book in books %}
+    {% for book in all_books %}
         <div class="list-item">
             <h3>{{ book.title }}</h3>
             <p>By <b>{{ book.author }}</b> ({{ book.publication_year }})</p>

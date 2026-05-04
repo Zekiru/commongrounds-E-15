@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit {{ book.title }}{% endblock %}
+
+{% block content %}
+    <h2 style="text-align: center;"><a href="{% url 'bookclub:book_list' %}">
+        BOOK CLUB LIBRARY
+    </a></h2>
+    <hr>
+    <h2>Edit Book: <strong>{{ book.title }}</strong></h2>
+    <form method="post" class="form-container">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="form_actions" style="align-items: center;">
+            <button type="submit" class="btn">Save Changes</button>
+            <a href="{% url 'bookclub:book_detail' book.pk %}" class="btn">Cancel</a>
+        </div>
+    </form>
+{% endblock %}
