@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if object %}Update Product
+    {% else %}Create Product{% endif %}
+
+    {% endblock %}
+
+{% block content %}
+    <h2>
+        {% if object %}Update Product
+        {% else %}Create Product{% endif %}
+    </h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <p>
+            <label>Name:</label><br>
+            {{ form.name }}
+        </p>
+        <p>
+            <label>Product Type:</label><br>
+            {{ form.product_type }}
+        </p>
+        <p>
+            <label>Image:</label><br>
+            {{ form.product_image }}
+        </p>
+        <p>
+            <label>Description:</label><br>
+            {{ form.description }}
+        </p>
+        <p>
+            <label>Price:</label><br>
+            {{ form.price }}
+        </p>
+        <p>
+            <label>Stock:</label><br>
+            {{ form.stock }}
+        </p>
+        <p>
+            <label>Status:</label><br>
+            {{ form.status }}
+        </p>
+        <button type="submit">
+            {% if object %}Update Product
+            {% else %}Create Product {% endif %}
+        
+        </button>
+    </form>
+    {% if object %}
+        <a href="{% url 'merchstore_detail' object.pk %}">Back</a>
+    {% else %}
+        <a href="{% url 'merchstore_list' %}">Back</a>
+    {% endif %}
+{% endblock %}
