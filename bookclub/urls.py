@@ -7,4 +7,4 @@ urlpatterns = [
     path('book/<int:pk>/', BookDetailView.as_view(), name="book_detail"),
 ]
 
-app_name = "bookclub"
+# app_name = "bookclub"

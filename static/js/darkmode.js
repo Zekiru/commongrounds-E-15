@@ -1,34 +1,23 @@
-const button = document.getElementById('darkmode-btn')
+const button = document.getElementById('darkmode-btn');
 
 function isDark() {
-    return document.documentElement.getAttribute(
-        'data-theme'
-    ) === 'dark';
+    return document.documentElement.getAttribute('data-theme') === 'dark';
+}
+
+function updateButtonUI() {
+    if (!button) return;
+    // We show the name of the mode you will switch TO
+    const nextTheme = isDark() ? 'light' : 'dark';
+    button.innerHTML = 'Toggle ' + nextTheme.charAt(0).toUpperCase() + nextTheme.slice(1) + ' Mode';
 }
 
 function toggleTheme() {
     const newTheme = isDark() ? 'light' : 'dark';
-    const otherTheme = isDark() ? 'dark' : 'light';
-    document.documentElement.setAttribute(
-        'data-theme', newTheme
-    );
+    document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
-    setButtonText(otherTheme);
+    updateButtonUI();
 }
 
-function setButtonText(text) {
-    document.getElementById('darkmode-btn').innerHTML = (
-        text[0].toUpperCase() + text.slice(1) + ' Mode'
-    );
-}
+updateButtonUI();
 
-window.onload = function() {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        setButtonText(isDark() ? 'light' : 'dark');
-    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        setButtonText('dark');
-    }
-};
+button.addEventListener('click', toggleTheme);

@@ -9,3 +9,62 @@
   * the scope of this path.
   */
 @source "../../../**/*.{html,py,js}";
+
+@utility django-form-container {
+  color: var(--color-gray-800);
+  
+  @variant dark {
+    color: var(--color-gray-200);
+  }
+
+  & input:not([type="checkbox"]), & select, & textarea {
+    width: 100%;
+    padding: 0.625rem; /* Equivalent to p-2.5 */
+    border: 2px solid var(--color-gray-300);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-white);
+    color: var(--color-gray-900);
+    margin-top: 0.25rem;
+    margin-bottom: 0.75rem;
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+
+    @variant dark {
+      border-color: var(--color-gray-600);
+      background-color: var(--color-gray-800);
+      color: var(--color-gray-50);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      background-color: var(--color-gray-100);
+      border-color: var(--color-gray-200);
+      color: var(--color-gray-400);
+      opacity: 0.7;
+      /* Ensure shadow/rings don't appear if you added focus styles */
+      box-shadow: none; 
+    }
+  }
+
+  & textarea {
+    resize: vertical;
+    min-height: 80px;
+    align-self: flex-start;
+  }
+
+  & input[type="checkbox"] {
+    width: 1.25rem !important; /* Equivalent to w-5 */
+    height: 1.25rem !important;
+    padding: 0 !important;
+    margin: 0 0.5rem 0 0 !important;
+    display: inline-block;
+    vertical-align: middle;
+    border: 2px solid var(--color-gray-600) !important;
+    accent-color: var(--color-indigo-600);
+
+    @variant dark {
+      border-color: var(--color-gray-400) !important;
+    }
+  }
+}

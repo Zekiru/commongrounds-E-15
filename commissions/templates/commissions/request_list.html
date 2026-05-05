@@ -3,49 +3,73 @@
 {% block title %}Commission Requests{% endblock %}
 
 {% block content %}
-    <div class="row">
-        <h2 class="align-left">List of Commission Requests</h2>
+<div class="flex items-center justify-between flex-wrap gap-4 my-6">
+    <h2 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">List of Commission Requests</h2>
+    <div class="flex items-center gap-5">
         {% if user.profile.role == 'CM' %}
-            <a class="btn add-btn align-right"
+            <a class="px-4 py-2 font-semibold text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors cursor-pointer"
             href="{% url 'request_create' %}">Create Request</a>
         {% endif %}
+        <a class="px-4 py-2 font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors cursor-pointer" 
+            href="{% url 'home' %}">Back</a>
     </div>
-    <div class="list-wrapper">
-        {% for category, queryset in requests.items %}
-            {% if queryset %}
-                {% if category == 'created' %}
-                    <h2>Created Requests</h2>
-                {% elif category == 'applied' %}
-                    <h2>Applied Requests</h2>
-                {% elif requests|length > 1 %}
-                    <h2>Other Requests</h2>
-                {% endif %}
-                {% for request in queryset %}
-                    <!-- for each individual commission request: -->
-                    <div class="list-item">
-                        <h3>{{ request.title }}</h3>
-                        <p>By {{ request.maker }}</p>
-                        <p>
-                            {% if request.status != 0 %}
-                                {{ request.get_status }}
-                            {% else %}
-                                {{ request.get_jobs_status }}
-                            {% endif %}
-                        </p>
-                        
-                        <div class="row">
-                            <p class="align-left"><i>{{ request.type }}</i></p>
-                            <a href="{{ request.get_absolute_url }}"
-                            class="btn align-right">
-                                View Request
-                            </a>
+</div>
+
+<div class="space-y-8">
+    {% for category, queryset in requests.items %}
+        {% if queryset %}
+            <div>
+                <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-1 border-gray-200 dark:border-gray-800">
+                    {% if category == 'created' %}
+                        Created Requests
+                    {% elif category == 'applied' %}
+                        Applied Requests
+                    {% elif requests|length > 1 %}
+                        Other Requests
+                    {% endif %}
+                </h3>
+
+                <div class="space-y-4">
+                    {% for request in queryset %}
+                        <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xs hover:shadow-md transition-all duration-200">
+                            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-3">
+                                <div>
+                                    <h4 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">
+                                        {{ request.title }}
+                                    </h4>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                        By <span class="font-medium text-gray-700 dark:text-gray-300">{{ request.maker }}</span>
+                                    </p>
+                                </div>
+
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 ring-1 ring-blue-700/10 dark:bg-blue-900/30 dark:text-blue-400 dark:ring-blue-400/20 self-start">
+                                    {% if request.status != 0 %}
+                                        {{ request.get_status }}
+                                    {% else %}
+                                        {{ request.get_jobs_status }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
+                                <span class="text-sm italic text-gray-500 dark:text-gray-400">
+                                    {{ request.type }}
+                                </span>
+                                
+                                <a href="{{ request.get_absolute_url }}" 
+                                   class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs transition-colors cursor-pointer">
+                                    View Request
+                                </a>
+                            </div>
                         </div>
-                    </div>
-                {% endfor %}
-                <hr>
-            {% endif %}
-        {% empty %}
-            <p>No requests available.</p><hr>
-        {% endfor %}
-    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    {% empty %}
+        <div class="text-center py-12 bg-gray-50 dark:bg-gray-900/50 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-800">
+            <p class="text-gray-500 dark:text-gray-400">No requests available.</p>
+        </div>
+    {% endfor %}
+</div>
 {% endblock %}

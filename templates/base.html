@@ -7,14 +7,24 @@
     <title>{% block title %}Common Grounds{% endblock %}</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <meta http-equiv="X-UA-Compatible" content="ie=edge"> -->
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
     {% tailwind_css %}
     {% block styles %}{% endblock %}
 
+    <script>
+        // Prevent On-Load Flicker from Dark Mode:
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
     <script src="{% static 'js/darkmode.js' %}" defer></script>
 </head>
-<body class="dark:bg-[#0a0a0a] dark:text-[#e0e0e0]  bg-[#fafafa] text-[#2c3e50] font-sans leading-relaxed p-0 m-0">
+<body class="dark:bg-[#0a0a0a] dark:text-[#e0e0e0]  bg-[#fafafa] text-[#2c3e50] font-sans leading-relaxed p-0 m-0 transition-all duration-200 ease-in-out">
     
     <header class="px-15 py-6.5 flex flex-row flex-wrap gap-6 items-center">
         <a href="/" class="mr-auto">
@@ -50,17 +60,22 @@
     </header>
 
     <nav class="sticky top-0 px-15 py-4 flex flex-row flex-wrap gap-6 mx-auto items-center z-50 bg-[#0f39ad] backdrop-blur-sm text-white">
+        
         <div class="mr-auto flex flex-row flex-wrap gap-8">
+            {% if user.is_authenticated %}
             <p>Welcome, 
                 <strong>{{ user.profile.display_name|default:user.username }}</strong>!
             </p>
             <p>Role - 
                 <strong>{{ user.profile.get_role_display }}</strong>
             </p>
+            {% else %}
+            <p><strong>Guest</strong></p>
+            {% endif %}
         </div>
-        <div class="flex flex-row flex-wrap gap-10 underline">
-            <a href="javascript:history.back()" class="py-1">Back</a>
-            <button id="darkmode-btn" class="py-1 hover:cursor-pointer" onclick="toggleTheme()">Dark Mode</button>
+        <div class="flex flex-row flex-wrap gap-10 font-semibold">
+            <!-- <a href="javascript:history.back()" class="py-1">Back</a> -->
+            <button id="darkmode-btn" class="py-1 hover:cursor-pointer hover:underline">Dark Mode</button>
         </div>
     </nav>
     
@@ -70,7 +85,7 @@
         {% block content %}{% endblock %}
     </div>
     
-    <footer class="my-8 text-center text-[#999] text-sm">
+    <footer class="my-8 text-center text-[#999] text-sm italic font-semibold">
         <p>CSCI 40 | E-15</p>
     </footer>
 
