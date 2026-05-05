@@ -6,7 +6,7 @@ class ProjectCreateForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = ['title', 'category', 'description',
-                  'materials', 'steps', 'creator']
+                  'materials', 'steps']
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
@@ -30,6 +30,10 @@ class ProjectReviewForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
+
+        user_profile = getattr(user, 'profile', None) if user else None
+        if user_profile:
+            pass
 
         if 'reviewer' in self.fields:
             if user_profile:
