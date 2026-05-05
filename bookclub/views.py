@@ -25,14 +25,20 @@ class BookListView(ListView):
         context = super().get_context_data(**kwargs)
         if self.request.user.is_authenticated:
             profile = self.request.user.profile
-            context['books_contributed'] = Book.objects.filter(contributor=profile)
-            context['books_bookmarked'] = Book.objects.filter(bookmark__profile=profile)
-            context['books_reviewed'] = Book.objects.filter(bookreview__user_reviewer=profile).distinct()
+            context['books_contributed'] = Book.objects.filter(
+                contributor=profile)
+            context['books_bookmarked'] = Book.objects.filter(
+                bookmark__profile=profile)
+            context['books_reviewed'] = Book.objects.filter(
+                bookreview__user_reviewer=profile).distinct()
 
             exclude_ids = (
-                list(context['books_contributed'].values_list('id', flat=True)) +
-                list(context['books_bookmarked'].values_list('id', flat=True)) +
-                list(context['books_reviewed'].values_list('id', flat=True))
+                list(context[
+                    'books_contributed'].values_list('id', flat=True)) +
+                list(context[
+                    'books_bookmarked'].values_list('id', flat=True)) +
+                list(context[
+                    'books_reviewed'].values_list('id', flat=True))
             )
             context['all_books'] = Book.objects.exclude(id__in=exclude_ids)
         return context
@@ -46,7 +52,8 @@ class BookDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['is_available'] = self.object.available_to_borrow
-        context['bookmark_count'] = Bookmark.objects.filter(book=self.object).count()
+        context['bookmark_count'] = Bookmark.objects.filter(
+            book=self.object).count()
         context['reviews'] = BookReview.objects.filter(book=self.object)
 
         if self.request.user.is_authenticated:
@@ -60,7 +67,10 @@ class BookDetailView(DetailView):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        if 'action' in request.POST and request.POST.get('action') == 'bookmark':
+        if (
+            'action' in request.POST and
+            request.POST.get('action') == 'bookmark'
+        ):
             if request.user.is_authenticated:
                 bookmark, created = Bookmark.objects.get_or_create(
                     profile=request.user.profile,
@@ -136,18 +146,22 @@ class BookBorrowView(CreateView):
         initial = super().get_initial()
         if self.request.user.is_authenticated:
             profile = getattr(self.request.user, 'profile', None)
-            initial['name'] = profile.display_name if profile else self.request.user.username
+            initial['name'] = (
+                profile.display_name if profile
+                else self.request.user.username)
         return initial
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
-        form.fields['date_borrowed'].widget = forms.DateInput(attrs={'type': 'date'})
+        form.fields['date_borrowed'].widget = forms.DateInput(
+            attrs={'type': 'date'})
         return form
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['book'] = self.book
-        context['return_date_preview'] = timezone.now().date() + timedelta(days=14)
+        context['return_date_preview'] = (
+            timezone.now().date() + timedelta(days=14))
         return context
 
     def form_valid(self, form):
@@ -166,7 +180,9 @@ class BookBorrowView(CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('bookclub:book_detail', kwargs={'pk': self.kwargs['pk']})
+        return reverse(
+            'bookclub:book_detail',
+            kwargs={'pk': self.kwargs['pk']})
 
     def post(self, request, *args, **kwargs):
         self.object = None
@@ -179,7 +195,8 @@ class BookBorrowView(CreateView):
                 parsed_date = parse_date(date_str)
                 if parsed_date:
                     context['selected_date'] = parsed_date
-                    context['date_to_return'] = parsed_date + timedelta(days=14)
+                    context['date_to_return'] = (
+                        parsed_date + timedelta(days=14))
             return self.render_to_response(context)
 
         return super().post(request, *args, **kwargs)
