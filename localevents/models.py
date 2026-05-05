@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class EventType(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
@@ -12,8 +13,14 @@ class EventType(models.Model):
 
 
 class Event(models.Model):
-    title = models.CharField(max_length=255)
-    category = models.ForeignKey(EventType, null=True, on_delete=models.SET_NULL)
+    title = models.CharField(
+        max_length=255
+    )
+    category = models.ForeignKey(
+        EventType,
+        null=True,
+        on_delete=models.SET_NULL
+    )
     description = models.TextField()
     location = models.CharField(max_length=255)
     start_time = models.DateTimeField()

@@ -5,11 +5,14 @@
 {% block content %}
     <h2>List of Products</h2>
     <div class="list-wrapper">
-        {% for product in products %}
+    {% for product in products %}
         <div class="list-item">
-            <h3>{{product.name}}</h3>
-            <p>{{product.price}}</p>
-            <a href="{{product.get_absolute_url}}"class="btn">View Product</a>
+            <h3>{{ product.name }}</h3>
+            <p>Price: <i>{{ product.price }}</i></p>
+            <a href="{{ product.get_absolute_url }}"
+            class="btn align-left">
+                View Product
+            </a>
         </div>
     {% empty %}
         <p>No products available.</p>

@@ -5,17 +5,21 @@
 {% block content %}
     <h2>Product Details</h2>
     <hr>
-    <h2>{{product.name}}</h2>
-    <p>{{product.description}}</p>
+    <h2>{{ product.name }}</h2>
+    <p>{{ product.description }}</p>
+    <br>
+    <h3>Type</h3>
+    {% if product.product_type %}
+    <h4>{{ product.product_type }}</h4>
+    <p>{{ product.product_type.description }}</p>
+    {% else %}
+    <h4>None</h4>
+    {% endif %}
     <table>
         <tr>
-            <th>Type:</th>
-            <td>{{product.product_type}}</td>
-        </tr>
-        <tr>
-            <th>Price:</th>
-            <td>{{product.price}}</td>
+            <th>Price</th>
+            <td>{{ product.price }}</td>
         </tr>
     </table>
-    <a href="/merchstore/items"class="back-btn btn">Back</a>
+    <a href="/merchstore/items"class="btn align-right">Back</a>
 {% endblock %}

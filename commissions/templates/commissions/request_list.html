@@ -5,11 +5,17 @@
 {% block content %}
     <h2>List of Commission Requests</h2>
     <div class="list-wrapper">
-        {% for request in requests %}
-            <div class="list-item">
-                <h3>{{ request.title }}</h3>
-                <a href="{{ request.get_absolute_url }}" class="btn">View Request</a>
-            </div>
-        {% endfor %}
+    {% for request in requests %}
+        <div class="list-item">
+            <h3>{{ request.title }}</h3>
+            <p><i>{{ request.commission_type }}</i></p>
+            <a href="{{ request.get_absolute_url }}"
+            class="btn align-left">
+                View Request
+            </a>
+        </div>
+    {% empty %}
+        <p>No requests available.</p>
+    {% endfor %}
     </div>
 {% endblock %}

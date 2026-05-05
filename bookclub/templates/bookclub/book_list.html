@@ -3,18 +3,20 @@
 {% block title %}Book Club Library{% endblock %}
 
 {% block content %}
-    <hr>
     <h2>Book Club Library</h2>
-    <ul>
-        {% for book in books %}
-            <li>
-                <b><a href="{% url 'bookclub:book_detail' book.pk %}">{{ book.title }}</a></b>
-                by {{ book.author }} ({{ book.publication_year }})
-                <br>
-                Genre: <b>{{ book.genre.name }}</b>
-            </li>
-        {% empty %}
-            <li>No books yet.</li>
-        {% endfor %}
-    </ul>
+    <div class="list-wrapper">
+    {% for book in books %}
+        <div class="list-item">
+            <h3>{{ book.title }}</h3>
+            <p>By <b>{{ book.author }}</b> ({{ book.publication_year }})</p>
+            <p><i>{{ book.genre.name }}</i></p>
+            <a href="{% url 'bookclub:book_detail' book.pk %}"
+            class="btn align-left">
+                View Book
+            </a>
+        </div>
+    {% empty %}
+        <p>No books available.</p>
+    {% endfor %}
+    </div>
 {% endblock %}

@@ -7,11 +7,15 @@
     <hr>
     <h2>{{ request.title }}</h2>
     <p>{{ request.description }}</p>
+    <br>
+    <h3>Type</h3>
+    {% if request.commission_type %}
+    <h4>{{ request.commission_type }}</h4>
+    <p>{{ request.commission_type.description }}</p>
+    {% else %}
+    <h4>None</h4>
+    {% endif %}
     <table>
-        <tr>
-            <th>Type</th>
-            <td>{{ request.commission_type }}</td>
-        </tr>
         <tr>
             <th>People Required</th>
             <td>{{ request.people_required }}</td>
@@ -25,5 +29,5 @@
             <td>{{ request.updated_on }}</td>
         </tr>
     </table>
-    <a href="/commissions/requests" class="back-btn btn">Back</a>
+    <a href="/commissions/requests" class="btn align-right">Back</a>
 {% endblock %}

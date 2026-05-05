@@ -1,25 +1,41 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ event.title }}</title>
-</head>
-<body>
-    <h1>{{ event.title }}</h1>
+{% extends "base.html" %}
 
-    <p><strong>Description:</strong> {{ event.description }}</p>
-    <p><strong>Location:</strong> {{ event.location }}</p>
-    <p><strong>Start:</strong> {{ event.start_time }}</p>
-    <p><strong>End:</strong> {{ event.end_time }}</p>
+{% block title %}Local Event Details{% endblock %}
 
+{% block content %}
+    <h2>Local Event Details</h2>
+    <hr>
+    <h2>{{ event.title }}</h2>
+    <p>{{ event.description }}</p>
+    <br>
+    <h3>Category</h3>
     {% if event.category %}
-        <p><strong>Category:</strong> {{ event.category.name }}</p>
+    <h4>{{ event.category.name }}</h4>
+    <p>{{ event.category.description }}</p>
     {% else %}
-        <p><strong>Category:</strong> None</p>
+    <h4>None</h4>
     {% endif %}
-
-    <p><strong>Created:</strong> {{ event.created_on }}</p>
-    <p><strong>Updated:</strong> {{ event.updated_on }}</p>
-
-    <p><a href="{% url 'event_list' %}">Back to events</a></p>
-</body>
-</html>
+    <table>
+        <tr>
+            <th>Location</th>
+            <td>{{ event.location }}</td>
+        </tr>
+        <tr>
+            <th>Start Time</th>
+            <td>{{ event.start_time }}</td>
+        </tr>
+        <tr>
+            <th>End Time</th>
+            <td>{{ event.end_time }}</td>
+        </tr>
+        <tr>
+            <th>Created On</th>
+            <td>{{ event.created_on }}</td>
+        </tr>
+        <tr>
+            <th>Updated On</th>
+            <td>{{ event.updated_on }}</td>
+        </tr>
+    </table>
+    <a href="{% url 'event_list' %}" class="btn align-right">Back</a>
+{% endblock %}
