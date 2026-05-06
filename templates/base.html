@@ -13,7 +13,6 @@
     {% block styles %}{% endblock %}
 
     <script>
-        // Prevent On-Load Flicker from Dark Mode:
         (function() {
             const savedTheme = localStorage.getItem('theme');
             const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -31,36 +30,35 @@
             <h1 class="text-[2.2rem] font-light my-auto text-left tracking-tight text-[#1a1a1a] dark:text-[#fafafa]">Common Grounds</h1>
         </a>
         <div class="p-0 relative inline-block">
-        {% if user.is_authenticated %}
-            <!-- Auth Controls -->
+            <!-- Header Buttons -->
             <div class="flex flex-row flex-wrap space-x-4 gap-5">
                 <!-- Home -->
                 <a href="/" class="text-blue-600 font-medium">Home</a>
-                <!-- Dashboard -->
-                {% if request.path != '/accounts/'|add:user.username|add:'/' %}
-                <a href="#" class="text-blue-600 font-medium">Dashboard</a>
+                {% if user.is_authenticated %}
+                    <!-- Dashboard -->
+                    {% if request.path != '/accounts/'|add:user.username|add:'/' %}
+                    <a href="#" class="text-blue-600 font-medium">Dashboard</a>
+                    {% endif %}
+                    <!-- Edit Profile -->
+                    {% if request.path != '/accounts/edit/'|add:user.username|add:'/' %}
+                    <a href="{% url 'update' user.username %}" class="text-blue-600 font-medium">Edit Profile</a>
+                    {% endif %}
+                    <!-- Logout -->
+                    <form method="POST" action="{% url 'logout' %}" class="m-0 h-full flex items-center">
+                        {% csrf_token %}
+                        <button type="submit"
+                                class="text-red-600 font-medium hover:cursor-pointer"
+                        >Logout</button>
+                    </form>
+                {% elif request.path != '/accounts/login/' %}
+                    <!-- Login -->
+                    <a href="{% url 'login' %}" class="text-blue-600 font-medium">Login</a>
                 {% endif %}
-                <!-- Edit Profile -->
-                {% if request.path != '/accounts/edit/'|add:user.username|add:'/' %}
-                <a href="{% url 'update' user.username %}" class="text-blue-600 font-medium">Edit Profile</a>
-                {% endif %}
-                <!-- Logout -->
-                <form method="POST" action="{% url 'logout' %}" class="m-0 h-full flex items-center">
-                    {% csrf_token %}
-                    <button type="submit"
-                            class="text-red-600 font-medium hover:cursor-pointer"
-                    >Logout</button>
-                </form>
             </div>
-        {% elif request.path != '/accounts/login/' %}
-            <!-- Login -->
-            <a href="{% url 'login' %}" class="text-blue-600 font-medium">Login</a>
-        {% endif %}
         </div>
     </header>
 
     <nav class="sticky top-0 px-15 py-4 flex flex-row flex-wrap gap-6 mx-auto items-center z-50 bg-[#0f39ad] backdrop-blur-sm text-white">
-        
         <div class="mr-auto flex flex-row flex-wrap gap-8">
             {% if user.is_authenticated %}
             <p>Welcome, 
@@ -70,11 +68,10 @@
                 <strong>{{ user.profile.get_role_display }}</strong>
             </p>
             {% else %}
-            <p><strong>Guest</strong> User</p>
+            <p>Welcome, <strong>Guest</strong> User!</p>
             {% endif %}
         </div>
         <div class="flex flex-row flex-wrap gap-10 font-semibold">
-            <!-- <a href="javascript:history.back()" class="py-1">Back</a> -->
             <button id="darkmode-btn" 
             class="px-2 py-1 hover:cursor-pointer hover:bg-gray-700 bg-gray-800 rounded-xl transition-all duration-200 ease-in-out 
             dark:bg-gray-300 dark:hover:bg-gray-400 dark:text-black">Dark Mode</button>

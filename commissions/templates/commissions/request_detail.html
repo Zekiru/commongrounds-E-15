@@ -5,24 +5,27 @@
 {% block content %}
 <div class="max-w-4xl mx-auto p-6">
     <!-- Header Section -->
-    <div class="flex justify-between items-center pb-4 mb-6">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-50">Commission Request Details</h1>
-        <div class="flex items-center gap-5">
-            {% if is_maker %}
-                <a href="{% url 'request_update' pk=request.pk %}" 
-                class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 font-semibold rounded-lg transition-colors duration-200 shadow-sm">
-                    Update Request
-                </a>
-            {% endif %}
-            <a class="px-4 py-2 font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors cursor-pointer" 
-            href="{% url 'request_list' %}">Back</a>
-        </div>
+    <div class="flex justify-between items-center pb-4 mb-6 border-b border-gray-200 dark:border-gray-800">
+        <h1 class="text-2xl font-light italic text-gray-900 dark:text-gray-50">Commission Request Details</h1>
+        <a href="{% url 'request_list' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 font-medium transition-colors">
+            Back to Requests
+        </a>
     </div>
 
     <!-- Summary Info -->
     <div class="mb-8">
-        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">{{ request.title }}</h2>
-        <p class="text-gray-600 dark:text-gray-400">By <span class="font-medium">{{ request.maker }}</span></p>
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="text-3xl font-semibold text-gray-800 dark:text-gray-100">{{ request.title }}</h2>
+                <p class="text-gray-600 dark:text-gray-400">By <span class="font-medium">{{ request.maker }}</span></p>
+            </div>
+            {% if is_maker %}
+                <a href="{% url 'request_update' pk=request.pk %}" 
+                class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 font-semibold rounded-lg transition-colors duration-200 shadow-sm">
+                    Update Request
+                </a>
+            {% endif %}
+        </div>
         
         <div class="mt-4 flex gap-6 text-sm">
             <div class="bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full border border-gray-200 dark:border-gray-700">
@@ -131,8 +134,8 @@
     <!-- Metadata & Footer -->
     <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
         <div class="text-xs text-gray-400 space-y-1">
-            <p>Created: {{ request.created_on|date:"M d, Y" }}</p>
-            <p>Last Updated: {{ request.updated_on|date:"M d, Y" }}</p>
+            <p>Created: {{ request.created_on|date:"h:m A | d M Y" }}</p>
+            <p>Last Updated: {{ request.updated_on|date:"h:m A | d M Y" }}</p>
         </div>
         <a href="{% url 'request_list' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 font-medium transition-colors">
             Back to Requests

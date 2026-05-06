@@ -4,18 +4,24 @@
 
 {% block content %}
 <div class="flex items-center justify-between flex-wrap gap-4 my-6">
-    <h2 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">List of Commission Requests</h2>
-    <div class="flex items-center gap-5">
-        {% if user.profile.role == 'CM' %}
-            <a class="px-4 py-2 font-semibold text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors cursor-pointer"
-            href="{% url 'request_create' %}">Create Request</a>
-        {% endif %}
-        <a class="px-4 py-2 font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors cursor-pointer" 
-            href="{% url 'home' %}">Back</a>
-    </div>
+    <h2 class="text-2xl font-light italic tracking-tight text-gray-900 dark:text-white">List of Commission Requests</h2>
+    <a href="{% url 'home' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 font-medium transition-colors">
+        Back to Home
+    </a>
 </div>
 
+{% if user.profile.role == 'CM' %}
+<div class="flex justify-between flex-wrap mb-4">
+    <p class="text-gray-500 text-sm my-auto">Commission Maker</p>
+    <a class="px-4 py-2 font-semibold text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors cursor-pointer"
+    href="{% url 'request_create' %}">+ Create Request</a>
+</div>
+{% endif %}
+
 <div class="space-y-8">
+    
+    
+
     {% for category, queryset in requests.items %}
         {% if queryset %}
             <div>
