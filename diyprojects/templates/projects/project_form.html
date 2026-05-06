@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if object %}Edit {{ object.title }}{% else %}Create New Project{% endif %}
+{% endblock %}
+
+{% block content %}
+    <h2>{% if object %}Update Project{% else %}Add New Project{% endif %}</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">
+            {% if object %}Update{% else %}Create{% endif %}
+        </button>
+    </form>
+    <br>
+    <a href="{% if object %}{% url 'diyprojects:project_detail' object.pk %}{% else %}{% url 'diyprojects:project_list' %}{% endif %}">
+        Cancel
+    </a>
+{% endblock %}

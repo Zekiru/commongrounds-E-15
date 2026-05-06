@@ -1,5 +1,13 @@
 from django.urls import path
-from .views import index, ProjectListView, ProjectDetailView
+from .views import (
+    index,
+    ProjectListView,
+    ProjectDetailView,
+    ProjectCreateView,
+    ProjectUpdateView
+)
+
+app_name = 'diyprojects'
 
 urlpatterns = [
     path('', index, name='index'),
@@ -9,8 +17,18 @@ urlpatterns = [
         name='project_list'
     ),
     path(
-        'project/<int:project_id>/',
+        'project/<int:pk>/',
         ProjectDetailView.as_view(),
         name='project_detail'
+    ),
+    path(
+        'project/add/',
+        ProjectCreateView.as_view(),
+        name='project_create'
+    ),
+    path(
+        'project/<int:pk>/edit/',
+        ProjectUpdateView.as_view(),
+        name='project_update'
     ),
 ]
