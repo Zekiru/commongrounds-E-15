@@ -5,9 +5,9 @@
 {% block content %}
     <h2 class="text-[2rem] font-bold mx-auto my-5">Directory</h2>
     <hr>
-    <div class="text-[1.2rem] flex flex-col gap-10 font-medium mx-auto my-10 items-center">
+    <div class="text-[1.2rem] flex flex-col gap-10 font-medium mx-auto my-10 items-center [&_a]:hover:underline">
         <div class="">
-            <a href="{% url 'merchstore-list' %}"
+            <a href="{% url 'merchstore_list' %}"
             class="directory-btn">
                 Merchandise Store
             </a>
@@ -19,7 +19,7 @@
             </a>
         </div>
         <div class="">
-            <a href="{% url 'book_list' %}"
+            <a href="{% url 'bookclub:book_list' %}"
             class="directory-btn">
                 Book Club
             </a>
@@ -37,12 +37,4 @@
             </a>
         </div>
     </div>
-{% endblock %}
-
-{% block styles %}
-<style>
-    a:hover {
-        text-decoration: underline;
-    }
-</style>
 {% endblock %}
