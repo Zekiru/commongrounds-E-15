@@ -42,7 +42,6 @@
       border-color: var(--color-gray-200);
       color: var(--color-gray-400);
       opacity: 0.7;
-      /* Ensure shadow/rings don't appear if you added focus styles */
       box-shadow: none; 
     }
   }
@@ -54,7 +53,7 @@
   }
 
   & input[type="checkbox"] {
-    width: 1.25rem !important; /* Equivalent to w-5 */
+    width: 1.25rem !important;
     height: 1.25rem !important;
     padding: 0 !important;
     margin: 0 0.5rem 0 0 !important;
@@ -66,5 +65,36 @@
     @variant dark {
       border-color: var(--color-gray-400) !important;
     }
+  }
+
+  & .errorlist {
+    list-style: none;
+    padding: 0;
+    margin: 0.25rem 0 0.75rem 0;
+    color: var(--color-red-600);
+    font-size: 0.875rem; /* text-sm */
+    font-weight: 500;
+
+    @variant dark {
+      color: var(--color-red-400);
+    }
+
+    & li {
+      margin-bottom: 0.125rem;
+    }
+  }
+
+  & .error input, & .error select, & .error textarea {
+    border-color: var(--color-red-500) !important;
+    background-color: var(--color-red-50);
+
+    @variant dark {
+      background-color: color-mix(in srgb, var(--color-red-950), transparent 80%);
+      border-color: var(--color-red-400) !important;
+    }
+  }
+
+  & ul {
+    margin: 1.5rem 0;
   }
 }
