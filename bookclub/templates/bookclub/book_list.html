@@ -1,82 +1,134 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block title %}Book Club Library{% endblock %}
 
 {% block content %}
-    <h2 style="text-align: center;">BOOK CLUB LIBRARY</h2>
-    <a href="{% url 'bookclub:book_add' %}" class="btn align-center" style="margin: 1px auto;">
-        Add New Book
+<div class="flex items-center justify-between flex-wrap gap-4 my-6">
+    <h2 class="text-2xl font-light italic tracking-tight text-gray-900 dark:text-white">Book Club Library</h2>
+    <a href="{% url 'home' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 font-medium transition-colors">
+        Back to Home
     </a>
-    <hr>
+</div>
+
+{% if user.profile.role == 'BC' %}
+<div class="flex justify-between mb-8">
+    <p class="text-gray-500 text-sm my-auto">Book Contributor</p>
+    <a href="{% url 'bookclub:book_add' %}" 
+       class="px-4 py-2 font-semibold text-white bg-green-600 hover:bg-green-700 rounded-lg transition-all active:scale-95 cursor-pointer shadow-sm">
+        + Add New Book
+    </a>
+</div>
+{% endif %}
+
+<div class="space-y-12">
+    
     {% if user.is_authenticated %}
+        
+        {# Section: Contributed #}
         {% if books_contributed %}
-            <h3>Books You Contributed</h3>
-            <div class="list-wrapper">
-            {% for book in books_contributed %}
-                <div class="list-item">
-                    <h3>{{ book.title }}</h3>
-                    <p>By <b>{{ book.author }}</b> ({{ book.publication_year }})</p>
-                    <p><i>{{ book.genre.name }}</i></p>
-                    <a href="{% url 'bookclub:book_detail' book.pk %}"
-                    class="btn align-left">
-                        View Book
-                    </a>
-                </div>
-            {% endfor%}
+        <section>
+            <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-1 border-gray-200 dark:border-gray-800">
+                Books You Contributed
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% for book in books_contributed %}
+                    <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start gap-2 mb-2">
+                                <h4 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">{{ book.title }}</h4>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">{{ book.publication_year }}</span>
+                            </div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">By <span class="font-medium text-gray-700 dark:text-gray-300">{{ book.author }}</span></p>
+                            <p class="text-xs italic text-blue-600 dark:text-blue-400 mt-2">{{ book.genre.name }}</p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-end">
+                            <a href="{% url 'bookclub:book_detail' book.pk %}" class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors cursor-pointer active:scale-95">View Book</a>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
+        </section>
         {% endif %}
-        
 
+        {# Section: Bookmarked #}
         {% if books_bookmarked %}
-            <h3>Books You Bookmarked</h3>
-            <div class="list-wrapper">
-            {% for book in books_bookmarked %}
-                <div class="list-item">
-                    <h3>{{ book.title }}</h3>
-                    <p>By <b>{{ book.author }}</b> ({{ book.publication_year }})</p>
-                    <p><i>{{ book.genre.name }}</i></p>
-                    <a href="{% url 'bookclub:book_detail' book.pk %}"
-                    class="btn align-left">
-                        View Book
-                    </a>
-                </div>
-            {% endfor%}
+        <section>
+            <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-1 border-gray-200 dark:border-gray-800">
+                Books You Bookmarked
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% for book in books_bookmarked %}
+                    <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start gap-2 mb-2">
+                                <h4 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">{{ book.title }}</h4>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">{{ book.publication_year }}</span>
+                            </div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">By <span class="font-medium text-gray-700 dark:text-gray-300">{{ book.author }}</span></p>
+                            <p class="text-xs italic text-blue-600 dark:text-blue-400 mt-2">{{ book.genre.name }}</p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-end">
+                            <a href="{% url 'bookclub:book_detail' book.pk %}" class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors cursor-pointer active:scale-95">View Book</a>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
+        </section>
         {% endif %}
-        
 
+        {# Section: Reviewed #}
         {% if books_reviewed %}
-            <h3>Books You Reviewed</h3>
-            <div class="list-wrapper">
-            {% for book in books_reviewed %}
-                <div class="list-item">
-                    <h3>{{ book.title }}</h3>
-                    <p>By <b>{{ book.author }}</b> ({{ book.publication_year }})</p>
-                    <p><i>{{ book.genre.name }}</i></p>
-                    <a href="{% url 'bookclub:book_detail' book.pk %}"
-                    class="btn align-left">
-                        View Book
-                    </a>
-                </div>
-            {% endfor %}
+        <section>
+            <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-1 border-gray-200 dark:border-gray-800">
+                Books You Reviewed
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% for book in books_reviewed %}
+                    <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start gap-2 mb-2">
+                                <h4 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">{{ book.title }}</h4>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">{{ book.publication_year }}</span>
+                            </div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">By <span class="font-medium text-gray-700 dark:text-gray-300">{{ book.author }}</span></p>
+                            <p class="text-xs italic text-blue-600 dark:text-blue-400 mt-2">{{ book.genre.name }}</p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-end">
+                            <a href="{% url 'bookclub:book_detail' book.pk %}" class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors cursor-pointer active:scale-95">View Book</a>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
+        </section>
         {% endif %}
     {% endif %}
-    
-    <h3>All Books</h3>
-    <div class="list-wrapper">
-    {% for book in all_books %}
-        <div class="list-item">
-            <h3>{{ book.title }}</h3>
-            <p>By <b>{{ book.author }}</b> ({{ book.publication_year }})</p>
-            <p><i>{{ book.genre.name }}</i></p>
-            <a href="{% url 'bookclub:book_detail' book.pk %}"
-            class="btn align-left">
-                View Book
-            </a>
+
+    {# Section: All Books #}
+    <section>
+        <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-1 border-gray-200 dark:border-gray-800">
+            All Books
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% for book in all_books %}
+                <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start gap-2 mb-2">
+                            <h4 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">{{ book.title }}</h4>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300">{{ book.publication_year }}</span>
+                        </div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">By <span class="font-medium text-gray-700 dark:text-gray-300">{{ book.author }}</span></p>
+                        <p class="text-xs italic text-blue-600 dark:text-blue-400 mt-2">{{ book.genre.name }}</p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-end">
+                        <a href="{% url 'bookclub:book_detail' book.pk %}" class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors cursor-pointer active:scale-95">View Book</a>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-span-full text-center py-12 bg-gray-50 dark:bg-gray-900/50 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-800">
+                    <p class="text-gray-500 dark:text-gray-400">No books available in the library.</p>
+                </div>
+            {% endfor %}
         </div>
-    {% empty %}
-        <p>No books available.</p>
-    {% endfor %}
-    </div>
+    </section>
+</div>
 {% endblock %}

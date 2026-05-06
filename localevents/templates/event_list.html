@@ -1,76 +1,122 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
+{% block title %}Local Events{% endblock %}
 
 {% block content %}
-<div style="max-width: 1080px; margin: 0 auto; padding: 40px 60px;">
+<div class="flex items-center justify-between flex-wrap gap-4 my-6">
+    <h2 class="text-2xl font-light italic tracking-tight text-gray-900 dark:text-white">Local Events</h2>
+    <a href="{% url 'home' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 font-medium transition-colors">
+        Back to Home
+    </a>
+</div>
 
-    <div style="text-align: center; margin-bottom: 35px;">
-        <h2 style="font-weight: normal; color: #1e90ff; letter-spacing: 1px;">
-            LOCAL EVENTS
-        </h2>
-    </div>
+{% if user.profile.role == 'EO' %}
+<div class="flex justify-between mb-8">
+    <p class="text-gray-500 text-sm my-auto">Event Organizer</p>
+    <a href="{% url 'event_create' %}" 
+       class="px-6 py-3 font-semibold text-white bg-green-600 hover:bg-green-700 rounded-lg transition-all active:scale-95 cursor-pointer shadow-sm">
+        + Create Event
+    </a>
+</div>
+{% endif %}
 
-    <hr>
-
-    <div style="text-align: center; margin: 30px 0;">
-        <a href="{% url 'event_create' %}"
-            style="background-color: #00a83b; color: white; padding: 14px 35px; text-decoration: none; border-radius: 5px; display: inline-block;">
-            Create Event
-        </a>
-    </div>
-
+<div class="space-y-12">
+    
     {% if user.is_authenticated %}
-    <h2 style="font-weight: normal; margin-top: 40px;">Events Created</h2>
+        {# Section: Events Created #}
+        <section>
+            <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-1 border-gray-200 dark:border-gray-800">
+                Events You Created
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for event in created_events %}
+                    <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start gap-2 mb-3">
+                                <h4 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">{{ event.title }}</h4>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 ring-1 ring-blue-700/10 dark:bg-blue-900/30 dark:text-blue-400 dark:ring-blue-400/20">
+                                    {{ event.status }}
+                                </span>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                                {{ event.location }}
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-end">
+                            <a href="{% url 'event_detail' event.id %}" class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors cursor-pointer active:scale-95">
+                                View Event
+                            </a>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="col-span-full text-sm text-gray-500 italic">You have not created any events.</p>
+                {% endfor %}
+            </div>
+        </section>
 
-    {% for event in created_events %}
-    <div style="background-color: #e3f3ff; padding: 35px; border-radius: 12px; margin: 30px 0;">
-        <h2 style="font-weight: normal;">{{ event.title }}</h2>
-        <p><strong>Status:</strong> {{ event.status }}</p>
-        <p><strong>Location:</strong> {{ event.location }}</p>
-        <a href="{% url 'event_detail' event.id %}"
-            style="background-color: #3498db; color: white; padding: 12px 28px; text-decoration: none; border-radius: 4px; display: inline-block;">
-            View Event
-        </a>
-    </div>
-    {% empty %}
-    <p>You have not created any events.</p>
-    {% endfor %}
-
-    <h2 style="font-weight: normal; margin-top: 40px;">Events Signed Up</h2>
-
-    {% for event in signed_up_events %}
-    <div style="background-color: #e3f3ff; padding: 35px; border-radius: 12px; margin: 30px 0;">
-        <h2 style="font-weight: normal;">{{ event.title }}</h2>
-        <p><strong>Status:</strong> {{ event.status }}</p>
-        <p><strong>Location:</strong> {{ event.location }}</p>
-        <a href="{% url 'event_detail' event.id %}"
-            style="background-color: #3498db; color: white; padding: 12px 28px; text-decoration: none; border-radius: 4px; display: inline-block;">
-            View Event
-        </a>
-    </div>
-    {% empty %}
-    <p>You have not signed up for any events.</p>
-    {% endfor %}
+        {# Section: Events Signed Up #}
+        <section>
+            <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-1 border-gray-200 dark:border-gray-800">
+                Events You Signed Up For
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for event in signed_up_events %}
+                    <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start gap-2 mb-3">
+                                <h4 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">{{ event.title }}</h4>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-50 text-green-700 ring-1 ring-green-700/10 dark:bg-green-900/30 dark:text-green-400 dark:ring-green-400/20">
+                                    {{ event.status }}
+                                </span>
+                            </div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                                {{ event.location }}
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-end">
+                            <a href="{% url 'event_detail' event.id %}" class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors cursor-pointer active:scale-95">
+                                View Event
+                            </a>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="col-span-full text-sm text-gray-500 italic">You have not signed up for any events.</p>
+                {% endfor %}
+            </div>
+        </section>
     {% endif %}
 
-    <h2 style="font-weight: normal; margin-top: 40px;">All Events</h2>
-
-    {% for event in events %}
-    <div style="background-color: #e3f3ff; padding: 35px; border-radius: 12px; margin: 30px 0;">
-        <h2 style="font-weight: normal;">{{ event.title }}</h2>
-        <p><strong>Status:</strong> {{ event.status }}</p>
-        <p><strong>Location:</strong> {{ event.location }}</p>
-        <a href="{% url 'event_detail' event.id %}"
-            style="background-color: #3498db; color: white; padding: 12px 28px; text-decoration: none; border-radius: 4px; display: inline-block;">
-            View Event
-        </a>
-    </div>
-    {% empty %}
-    <p>No events yet.</p>
-    {% endfor %}
-
-    <p style="margin-top: 30px;">
-        <a href="{% url 'home' %}">Back to Home</a>
-    </p>
-
+    {# Section: All Events #}
+    <section>
+        <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-1 border-gray-200 dark:border-gray-800">
+            All Events
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for event in events %}
+                <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start gap-2 mb-3">
+                            <h4 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">{{ event.title }}</h4>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-700 ring-1 ring-gray-700/10 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-300/20">
+                                {{ event.status }}
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                            {{ event.location }}
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-end">
+                        <a href="{% url 'event_detail' event.id %}" class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors cursor-pointer active:scale-95">
+                            View Event
+                        </a>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-span-full text-center py-12 bg-gray-50 dark:bg-gray-900/50 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-800">
+                    <p class="text-gray-500 dark:text-gray-400">No events available yet.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
 </div>
 {% endblock %}
