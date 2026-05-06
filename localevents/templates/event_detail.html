@@ -1,41 +1,123 @@
-{% extends "base.html" %}
-
-{% block title %}Local Event Details{% endblock %}
+{% extends 'base.html' %}
 
 {% block content %}
-    <h2>Local Event Details</h2>
+<div style="max-width: 900px; margin: 0 auto; padding: 40px 60px;">
+
+    <div style="text-align: center; margin-bottom: 35px;">
+        <h2 style="font-weight: normal; color: #1e90ff; letter-spacing: 1px;">
+            LOCAL EVENTS
+        </h2>
+    </div>
+
     <hr>
-    <h2>{{ event.title }}</h2>
-    <p>{{ event.description }}</p>
-    <br>
-    <h3>Category</h3>
-    {% if event.category %}
-    <h4>{{ event.category.name }}</h4>
-    <p>{{ event.category.description }}</p>
-    {% else %}
-    <h4>None</h4>
+
+    <h2 style="font-weight: normal; margin-top: 40px;">{{ event.title }}</h2>
+
+    {% if event.event_image %}
+    <div style="margin: 25px 0;">
+        <img src="{{ event.event_image.url }}" alt="{{ event.title }}" style="max-width: 300px;">
+    </div>
     {% endif %}
-    <table>
+
+    <p>
+        <strong>Status:</strong>
+        {% if event.status == 'Full' or event.status == 'Cancelled' or event.status == 'Done' %}
+        <span style="color: red;">{{ event.status }}</span>
+        {% else %}
+        <span style="color: green;">{{ event.status }}</span>
+        {% endif %}
+    </p>
+
+    <p><strong>Category</strong></p>
+    <p>
+        {% if event.category %}
+        {{ event.category.name }}
+        {% else %}
+        None
+        {% endif %}
+    </p>
+
+    <table style="width: 100%; border-collapse: collapse; margin-top: 25px;">
         <tr>
-            <th>Location</th>
-            <td>{{ event.location }}</td>
+            <td style="border: 1px solid #ccc; padding: 15px;"><strong>Description</strong></td>
+            <td style="border: 1px solid #ccc; padding: 15px;">{{ event.description }}</td>
         </tr>
         <tr>
-            <th>Start Time</th>
-            <td>{{ event.start_time }}</td>
+            <td style="border: 1px solid #ccc; padding: 15px;"><strong>Location</strong></td>
+            <td style="border: 1px solid #ccc; padding: 15px;">{{ event.location }}</td>
         </tr>
         <tr>
-            <th>End Time</th>
-            <td>{{ event.end_time }}</td>
+            <td style="border: 1px solid #ccc; padding: 15px;"><strong>Start</strong></td>
+            <td style="border: 1px solid #ccc; padding: 15px;">{{ event.start_time }}</td>
         </tr>
         <tr>
-            <th>Created On</th>
-            <td>{{ event.created_on }}</td>
+            <td style="border: 1px solid #ccc; padding: 15px;"><strong>End</strong></td>
+            <td style="border: 1px solid #ccc; padding: 15px;">{{ event.end_time }}</td>
         </tr>
         <tr>
-            <th>Updated On</th>
-            <td>{{ event.updated_on }}</td>
+            <td style="border: 1px solid #ccc; padding: 15px;"><strong>Capacity</strong></td>
+            <td style="border: 1px solid #ccc; padding: 15px;">{{ signup_count }} / {{ event.event_capacity }}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #ccc; padding: 15px;"><strong>Organizer</strong></td>
+            <td style="border: 1px solid #ccc; padding: 15px;">
+                {% for organizer in event.organizer.all %}
+                {{ organizer.display_name }}
+                {% empty %}
+                None
+                {% endfor %}
+            </td>
         </tr>
     </table>
-    <a href="{% url 'event_list' %}" class="btn align-right">Back</a>
+
+    <div style="text-align: center; margin: 35px 0;">
+        {% if is_organizer %}
+        <a href="{% url 'event_update' event.id %}"
+            style="background-color: #3498db; color: white; padding: 12px 28px; text-decoration: none; border-radius: 4px;">
+            Edit Event
+        </a>
+        <p style="margin-top: 20px;">You cannot sign up for your own event.</p>
+        {% else %}
+        {% if is_full %}
+        <button disabled
+            style="background-color: gray; color: white; padding: 12px 28px; border: none; border-radius: 4px;">
+            Sign Up
+        </button>
+        <p>This event is full.</p>
+        {% else %}
+        {% if user.is_authenticated %}
+        <form method="POST" action="{% url 'event_signup' event.id %}">
+            {% csrf_token %}
+            <button type="submit"
+                style="background-color: #3498db; color: white; padding: 12px 28px; border: none; border-radius: 4px;">
+                Sign Up
+            </button>
+        </form>
+        {% else %}
+        <a href="{% url 'event_signup' event.id %}"
+            style="background-color: #3498db; color: white; padding: 12px 28px; text-decoration: none; border-radius: 4px;">
+            Sign Up
+        </a>
+        {% endif %}
+        {% endif %}
+        {% endif %}
+    </div>
+
+    <hr>
+
+    <h3 style="font-weight: normal;">Signups</h3>
+
+    <ul>
+        {% for signup in signups %}
+        <li>{{ signup }}</li>
+        {% empty %}
+        <li>No signups yet.</li>
+        {% endfor %}
+    </ul>
+
+    <p style="margin-top: 30px;">
+        <a href="{% url 'event_list' %}">Back to Events</a>
+    </p>
+
+</div>
 {% endblock %}

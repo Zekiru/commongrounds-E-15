@@ -1,18 +1,32 @@
 {% extends 'base.html' %}
 
-{% block title %}Book Club Details{% endblock %}
+{% block title %}Book Details{% endblock %}
 
 {% block content %}
-    <h2>Book Details</h2>
+    <h2 style="text-align: center;"><a href="{% url 'bookclub:book_list' %}">
+        BOOK CLUB LIBRARY
+    </a></h2>
+
     <hr>
+
     <h2>{{ book.title }}</h2>
+
+    <p><b>Status:</b>
+        {% if book.available_to_borrow %}
+            <span style="color: green;">Available to Borrow</span>
+        {% else %}
+            <span style="color: red;">Currently Checked Out</span>
+        {% endif %}
+    </p>
+
     <h3>Genre</h3>
     {% if book.genre %}
-    <h4>{{ book.genre.name }}</h4>
-    <p>{{ book.genre.description }}</p>
+        <h4>{{ book.genre.name }}</h4>
+        <p>{{ book.genre.description }}</p>
     {% else %}
-    <h4>None</h4>
+        <h4>None</h4>
     {% endif %}
+
     <table>
         <tr>
             <th>Author</th>
@@ -23,6 +37,10 @@
             <td>{{ book.publication_year }}</td>
         </tr>
         <tr>
+            <th>Synopsis</th>
+            <td>{{ book.synopsis }}</td>
+        </tr>
+        <tr>
             <th>Created</th>
             <td>{{ book.created_on }}</td>
         </tr>
@@ -31,5 +49,73 @@
             <td>{{ book.updated_on }}</td>
         </tr>
     </table>
-    <a href="/bookclub/books"class="btn align-right">Back</a>
+
+    <div class="actions" style="align-items: center;">
+        <a href="{% url 'bookclub:book_borrow' book.pk %}"
+            class="btn" 
+            style="width: max-content; min-width: 0; padding: 8px 15px; display: inline-block;">
+            Borrow this Book
+        </a>
+        {% if user.is_authenticated and user.profile == book.contributor %}
+            <a href="{% url 'bookclub:book_edit' book.pk %}" 
+                class="btn" 
+                style="width: max-content; min-width: 0; padding: 8px 15px; display: inline-block;">
+                Edit Book
+            </a>
+        {% endif %}
+    </div>
+
+    <hr>
+
+    <div class="bookmark-section">
+        <p>Total Bookmarks: <strong>{{ bookmark_count }}</strong></p>
+        {% if user.is_authenticated %}
+            <form method="POST" style="display: inline">
+                {% csrf_token %}
+                <button type="submit" name="action" value="bookmark" class="btn">
+                    {% if user_has_bookmarked %}
+                        Remove Bookmark
+                    {% else %}
+                        Bookmark
+                    {% endif %}
+                </button>
+            </form>
+        {% endif %}
+    </div>
+
+    <hr>
+
+    <div class="add_review">
+        <h3>Write a Review</h3>
+        <form method="POST">
+            {%  csrf_token %}
+            <div style="margin-bottom: 10px;">
+                <input type="text" name="title" placeholder="Review Title">
+            </div>
+            <div style="margin-bottom: 10px;">
+                <textarea name="comment" placeholder="Write your review here..."></textarea>
+            </div>
+            <button type="submit" class="btn">Submit Review</button>
+        </form>
+    </div>
+
+    <h3>Reviews</h3>
+    <div class="reviews_section">
+        {% for review in reviews %}
+            <div class="review_item">
+                <h4>{{ review.title }}</h4>
+                <p>{{ review.comment }}</p>
+                <small>
+                    By: 
+                    {% if review.user_reviewer %}
+                        {{ review.user_reviewer.display_name }}
+                    {% else %}
+                        Anonymous
+                    {% endif %}
+                </small>
+            </div>
+        {% empty %}
+            <p>No reviews yet.</p>
+        {% endfor %}
+    </div>
 {% endblock %}

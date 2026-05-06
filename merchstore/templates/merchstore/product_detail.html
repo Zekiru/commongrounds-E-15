@@ -7,6 +7,9 @@
     <hr>
     <h2>{{ product.name }}</h2>
     <p>{{ product.description }}</p>
+    {% if product.product_image %}
+        <img src ="{{ product.product_image.url }}" alt="" width="300">
+    {% endif %}
     <br>
     <h3>Type</h3>
     {% if product.product_type %}
@@ -20,6 +23,33 @@
             <th>Price</th>
             <td>{{ product.price }}</td>
         </tr>
+        <tr>
+            <th>Stock</th>
+            <td>{{ product.stock }}</td>
+        </tr>
+        <tr>
+            <th>Status</th>
+            <td>{{ product.status }}</td>
+        </tr>
     </table>
+    {% if user.is_authenticated and user.profile != product.owner %}
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+
+            <button type="submit"
+                {% if product.stock == 0 %}disabled{% endif %}>
+                Buy
+            </button>
+        </form>
+    {% endif %}
+
+
+    {% if user.is_authenticated and user.profile == product.owner %}
+        <a href="{% url 'merchstore_update' product.id %}">
+            Edit Product
+        </a>
+    {% endif %}
     <a href="/merchstore/items"class="btn align-right">Back</a>
 {% endblock %}
