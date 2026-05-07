@@ -101,8 +101,9 @@ class BookDetailView(DetailView):
 
 class BookCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
     model = Book
-    template_name = 'bookclub/book_add.html'
+    template_name = 'bookclub/book_form.html'
     required_role = "BC"
+    context_object_name = "book"
 
     def get_form_class(self):
         return BookFormFactory.get_form("contribute")
@@ -121,8 +122,9 @@ class BookCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
 
 class BookUpdateView(LoginRequiredMixin, RoleRequiredMixin, UpdateView):
     model = Book
-    template_name = 'bookclub/book_edit.html'
+    template_name = 'bookclub/book_form.html'
     required_role = "BC"
+    context_object_name = "book"
 
     def get_form_class(self):
         return BookFormFactory.get_form("update")
