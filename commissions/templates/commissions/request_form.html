@@ -1,85 +1,92 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Commission Form{% endblock %}
+{% block title %}
+    {% if object %}Edit Request: {{ object.title }}{% else %}Commission Form{% endif %}
+{% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto my-8 p-8 bg-white border-2 border-gray-200 rounded-xl shadow-sm dark:bg-gray-900 dark:border-gray-800">
+<main class="detail-container">
     
-    <h2 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white mb-8">
-        {% if object %} Update Request {% else %} Create Request {% endif %}
-    </h2>
+    <header class="detail-header">
+        <h1>
+            {% if object %}Update Request{% else %}Create Commission Request{% endif %}
+        </h1>
+        <a href="{% if object %}{% url 'request_detail' object.pk %}{% else %}{% url 'request_list' %}{% endif %}" 
+           class="link-back">
+            Cancel and Return
+        </a>
+    </header>
 
-    <form method="POST" enctype="multipart/form-data" class="space-y-6">
-        {% csrf_token %}
+    <div class="max-w-6xl mx-auto my-8 p-8 bg-white border-2 border-gray-200 rounded-xl shadow-sm dark:bg-gray-900 dark:border-gray-800">
         
-        <div class="django-form-container space-y-4">
-            {{ form }}
-        </div>
+        <form method="POST" enctype="multipart/form-data" class="space-y-8">
+            {% csrf_token %}
+            
+            <div class="django-form-container space-y-4">
+                <section class="section-label px-0! mt-0!">
+                    <h3>Request Details</h3>
+                </section>
+                {{ form.as_p }}
+            </div>
 
-        <div class="border-t-2 border-gray-200 dark:border-gray-700 pt-6">
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Jobs</h3>
-        </div>
-        
-        {% for inline in inlines %}
-            {{ inline.management_form }}
+            <div class="border-t-2 border-gray-200 dark:border-gray-700 pt-6">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Jobs</h3>
+            </div>
+            
+            {% for inline in inlines %}
+                {{ inline.management_form }}
 
-            {% if inline.non_form_errors %}
-                <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 border border-red-200 dark:bg-gray-800 dark:text-red-400 dark:border-red-900" role="alert">
-                    {% for error in inline.non_form_errors %}
-                        <p class="font-medium">{{ error }}</p>
+                {% if inline.non_form_errors %}
+                    <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 border border-red-200 dark:bg-gray-800 dark:text-red-400 dark:border-red-900" role="alert">
+                        {% for error in inline.non_form_errors %}
+                            <p class="font-medium">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div id="jobs-container" class="django-form-container space-y-4">
+                    {% for job_form in inline %}
+                        <div class="job-form-row p-5 border-2 border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-800/40 dark:border-gray-700 flex flex-col lg:flex-row lg:items-end justify-between gap-6 [&_textarea]:self-start">
+                            <div class="job-item flex-1 space-y-2">
+                                {{ job_form.as_p }}
+                            </div>
+                            <button type="button" class="remove-btn hidden btn-action dark text-red-500! border-red-500! hover:bg-red-500! hover:text-white! text-xs py-1.5 shrink-0 mb-4">
+                                Remove Job
+                            </button>
+                        </div>
                     {% endfor %}
                 </div>
-            {% endif %}
 
-            <div id="jobs-container" class="django-form-container space-y-4">
-                
-                {% for job_form in inline %}
+                <div id="empty-form-template" class="hidden">
                     <div class="job-form-row p-5 border-2 border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-800/40 dark:border-gray-700 flex flex-col lg:flex-row lg:items-end justify-between gap-6 [&_textarea]:self-start">
                         <div class="job-item flex-1 space-y-2">
-                            {{ job_form }}
+                            {{ inline.empty_form.as_p }}
                         </div>
-                        <button type="button" class="remove-btn hidden px-4 py-2 text-sm font-semibold text-red-600 hover:text-white border-2 border-red-600 hover:bg-red-600 rounded-lg transition-colors duration-200 shrink-0 self-center lg:self-end cursor-pointer">
-                            Remove Job
-                        </button>
-                    </div>
-                {% endfor %}
-            </div>
-
-            <div id="empty-form-template" class="hidden">
-                <div class="job-form-row p-5 border-2 border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-800/40 dark:border-gray-700 flex flex-col lg:flex-row lg:items-end justify-between gap-6 [&_textarea]:self-start">
-                    <div class="job-item flex-1 space-y-2">
-                        {{ inline.empty_form }}
-                        <button type="button" class="remove-btn px-4 py-2 text-sm font-semibold text-red-600 hover:text-white border-2 border-red-600 hover:bg-red-600 rounded-lg transition-colors duration-200 shrink-0 self-center lg:self-end cursor-pointer">
+                        <button type="button" class="remove-btn btn-action dark !text-red-500 !border-red-500 hover:!bg-red-500 hover:!text-white text-xs py-1.5 shrink-0 mb-4">
                             Remove Job
                         </button>
                     </div>
                 </div>
+            {% endfor %}
+
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t-2 border-gray-200 dark:border-gray-700">
+                <button type="button" id="add-job-btn" class="btn-action dark w-full sm:w-auto">
+                    + Add Job
+                </button>
+
+                <button type="submit" class="btn-action primary w-full sm:w-auto">
+                    {% if object %}Update Request{% else %}Submit Request{% endif %}
+                </button>
             </div>
-        {% endfor %}
+        </form>
+    </div>
 
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t-2 border-gray-200 dark:border-gray-700">
-            <button type="button" id="add-job-btn" class="cursor-pointer w-full sm:w-auto px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 transition-colors">
-                + Add Job
-            </button>
-
-            <button type="submit" class="cursor-pointer w-full sm:w-auto px-6 py-3 text-sm font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-blue-300 transition-colors">
-                Submit Request
-            </button>
-        </div>
-    </form>
-</div>
-
-<div class="max-w-6xl mx-auto flex justify-end px-2 mb-8">
-    {% if object.pk %}
-        <a href="{% url 'request_detail' object.pk %}" class="text-sm font-medium text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors">
-            Back to Details
-        </a>
-    {% else %}
-        <a href="{% url 'request_list' %}" class="text-sm font-medium text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors">
-            Back to List
-        </a>
-    {% endif %}
-</div>
+    <footer class="detail-footer">
+        <p></p>
+        <a href="{% url 'request_list' %}" class="link-back">Back to Commissions</a>
+    </footer>
+</main>
 {% endblock %}
 
 {% block scripts %}
@@ -92,7 +99,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalForms = document.querySelector('input[name$="-TOTAL_FORMS"]');
     const formPrefix = totalForms.name.replace('-TOTAL_FORMS', '');
 
-    // ADD FORM LOGIC
     addBtn.addEventListener('click', function(e) {
         e.preventDefault();
         const currentFormCount = parseInt(totalForms.value);
@@ -102,7 +108,6 @@ document.addEventListener('DOMContentLoaded', function() {
         totalForms.value = currentFormCount + 1;
     });
 
-    // REMOVE FORM LOGIC
     container.addEventListener('click', function(e) {
         if (e.target.closest('.remove-btn')) {
             e.preventDefault();
@@ -119,7 +124,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // RE-INDEXING LOGIC
     function updateFormIndexes() {
         const rows = container.querySelectorAll('.job-form-row');
         const regex = new RegExp(`${formPrefix}-\\d+`);
