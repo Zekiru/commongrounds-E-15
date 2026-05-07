@@ -23,8 +23,6 @@
       &:focus {
         @apply outline-none;
         border-color: var(--color-blue-500);
-        ring: 2px;
-        ring-color: var(--color-blue-500);
       }
 
       &:disabled {
