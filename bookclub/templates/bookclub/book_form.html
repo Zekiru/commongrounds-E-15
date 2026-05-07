@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if book.pk %}Edit {{ book.title }}{% else %}Add a Book{% endif %}
+{% endblock %}
+
+{% block content %}
+    <h2 style="text-align: center;"><a href="{% url 'bookclub:book_list' %}">
+        BOOK CLUB LIBRARY
+    </a></h2>
+    <hr>
+
+    <h2>
+        {% if book.pk %}Edit <strong>{{ book.title }}</strong>
+        {% else %}Add a Book{% endif %}
+    </h2>
+    <form method="post" class="form-container">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <div class="form-actions" style="align-items: center;">
+            <button type="submit" class="btn">
+                {% if book.pk %}Save Changes{% else %}Create Book{% endif %}
+            </button>
+            <a href="{% if book.pk %}{% url 'bookclub:book_detail' book.pk %}{% else %}{% url 'bookclub:book_list' %}{% endif %}"
+                class="btn secondary">
+                Cancel
+            </a>
+        </div>
+    </form>
+{% endblock %}
