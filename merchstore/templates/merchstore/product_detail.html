@@ -1,10 +1,16 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block title %}Merch Store Details{% endblock %}
 
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+{% endblock %}
+
 {% block content %}
+<div class="detail-container">
     <h2>Product Details</h2>
-    <hr>
     <h2>{{ product.name }}</h2>
     <p>{{ product.description }}</p>
     {% if product.product_image %}
@@ -52,4 +58,5 @@
         </a>
     {% endif %}
     <a href="/merchstore/items"class="btn align-right">Back</a>
+</div>
 {% endblock %}

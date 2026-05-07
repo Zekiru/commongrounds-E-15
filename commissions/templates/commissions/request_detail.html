@@ -3,83 +3,76 @@
 {% block title %}Commission: {{ request.title }}{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto p-6">
-    <div class="flex justify-between items-center pb-4 mb-6 border-b border-gray-200 dark:border-gray-800">
-        <h1 class="text-2xl font-light italic text-gray-900 dark:text-gray-50  tracking-tight">Commission Details</h1>
-        <a href="{% url 'request_list' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 font-medium transition-colors">
-            Back to Requests
-        </a>
-    </div>
+<main class="detail-container">
+    
+    <header class="detail-header">
+        <h1>Commission Details</h1>
+        <a href="{% url 'request_list' %}" class="link-back">Back to Requests</a>
+    </header>
 
-    <div class="mb-8">
-        <div class="flex justify-between items-center">
+    <section class="detail-hero">
+        <div class="flex justify-between items-start">
             <div>
-                <h2 class="text-3xl font-semibold text-gray-800 dark:text-gray-100">{{ request.title }}</h2>
-                <p class="text-gray-600 dark:text-gray-400">By <span class="font-medium">{{ request.maker.display_name }}</span></p>
+                <h2>{{ request.title }}</h2>
+                <p>By <span class="font-medium text-gray-900 dark:text-gray-100">{{ request.maker.display_name }}</span></p>
             </div>
             {% if is_maker %}
-                <a href="{% url 'request_update' pk=request.pk %}" 
-                class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 font-semibold rounded-lg transition-colors duration-200 shadow-sm">
-                    Update Request
-                </a>
+                <a href="{% url 'request_update' pk=request.pk %}" class="btn-action primary">Update Request</a>
             {% endif %}
         </div>
         
-        <div class="mt-4 flex gap-6 text-sm">
-            <div class="bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full border border-gray-200 dark:border-gray-700">
-                <span class="text-gray-500 uppercase tracking-wider font-bold text-xs">Status:</span> 
-                {{ summary.status }}
-            </div>
+        <div class="mt-6 flex flex-wrap gap-4">
+            <div class="status-pill"><span>Status:</span> {{ summary.status }}</div>
             {% if request.status == 0 %}
-            <div class="bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full border border-gray-200 dark:border-gray-700">
-                <span class="text-gray-500 uppercase tracking-wider font-bold text-xs">Openings:</span> 
-                {{ summary.open_manpower }} / {{ summary.total_manpower }}
-            </div>
+                <div class="status-pill">
+                    <span>Openings:</span> {{ summary.open_manpower }} / {{ summary.total_manpower }}
+                </div>
             {% endif %}
         </div>
-    </div>
+    </section>
 
-    <div class="prose dark:prose-invert mb-8">
-        <p class="text-lg leading-relaxed text-gray-700 dark:text-gray-300">
-            {{ request.description }}
-        </p>
-    </div>
+    <article class="detail-body">
+        {{ request.description|linebreaks }}
+    </article>
 
-    <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200 dark:border-gray-800 mb-10">
-        <h3 class="text-xs font-bold uppercase text-gray-500 mb-2">Commission Type</h3>
+    <div class="info-card variant-ghost mb-10">
+        <span class="text-[10px] font-bold uppercase text-gray-500 tracking-widest mb-2 block">Commission Type</span>
         {% if request.type %}
-            <h4 class="text-lg font-bold text-gray-900 dark:text-white">{{ request.type.name }}</h4>
+            <h4 class="text-gray-900 dark:text-white! mb-1">{{ request.type.name }}</h4>
             <p class="text-sm text-gray-600 dark:text-gray-400">{{ request.type.description }}</p>
         {% else %}
-            <h4 class="text-gray-400 italic">No specific type assigned</h4>
+            <h4 class="text-gray-400 italic font-normal">No specific type assigned</h4>
         {% endif %}
     </div>
 
     <hr class="border-gray-200 dark:border-gray-800 my-8">
 
-    <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Job List</h2>
-        <span class="text-sm font-medium text-gray-500 italic">Hiring Status: {{ request.get_jobs_status }}</span>
+    <div class="section-label">
+        <h3>Job List</h3>
+        <span class="label-aux">Hiring Status: {{ request.get_jobs_status }}</span>
     </div>
 
     <div class="grid gap-4">
-    {% for category, queryset in jobs.items %}
-        {% if queryset %}
+        {% for category, queryset in jobs.items %}
             {% for job in queryset %}
-                <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 group">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="info-card">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                        
                         <div class="space-y-1">
                             <div class="flex items-center gap-3">
-                                <h3 class="text-xl font-bold text-blue-600 dark:text-blue-400">{{ job.role }}</h3>
+                                <h4>{{ job.role }}</h4>
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase border 
-                                    {% if job.status == 0 %}border-green-200 text-green-600 bg-green-50 dark:bg-green-900/20 dark:border-green-800
-                                    {% else %}border-gray-200 text-gray-500 bg-gray-50 dark:bg-gray-700 dark:border-gray-600{% endif %}">
+                                    {% if job.status == 0 %}
+                                        border-green-200 text-green-600 bg-green-50 dark:bg-green-900/20 dark:border-green-800
+                                    {% else %}
+                                        border-gray-200 text-gray-500 bg-gray-50 dark:bg-gray-700 dark:border-gray-600
+                                    {% endif %}">
                                     {{ job.get_status }}
                                 </span>
                             </div>
-                            <div class="flex items-center gap-4 text-sm text-gray-500">
-                                <span>Slots Available: <b class="text-gray-900 dark:text-gray-200">{{ job.opening_count }} / {{ job.manpower_required }}</b></span>
-                            </div>
+                            <p class="text-sm text-gray-500">
+                                Slots: <b class="text-gray-900 dark:text-gray-200">{{ job.opening_count }} / {{ job.manpower_required }}</b>
+                            </p>
                         </div>
 
                         <div class="flex flex-wrap items-center gap-4">
@@ -87,56 +80,38 @@
                                 <div class="flex border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden text-xs bg-gray-50 dark:bg-gray-900">
                                     <div class="px-3 py-1 border-r border-gray-200 dark:border-gray-700 text-center">
                                         <div class="font-bold text-blue-500">{{ job.app_counts.pending }}</div>
-                                        <div class="text-[9px] uppercase tracking-tighter">Pending</div>
+                                        <div class="text-[9px] uppercase tracking-tighter text-gray-500">Pending</div>
                                     </div>
                                     <div class="px-3 py-1 text-center">
                                         <div class="font-bold text-green-500">{{ job.app_counts.accepted }}</div>
-                                        <div class="text-[9px] uppercase tracking-tighter">Filled</div>
+                                        <div class="text-[9px] uppercase tracking-tighter text-gray-500">Filled</div>
                                     </div>
                                 </div>
-                                <a href="{% url 'job_detail' pk=job.pk %}" 
-                                   class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg transition-colors shadow-sm">
-                                    Manage
-                                </a>
-
+                                <a href="{% url 'job_detail' pk=job.pk %}" class="btn-action primary text-sm">Manage</a>
+                            
                             {% elif category == 'applied' %}
-                                <div class="flex flex-col items-end gap-1">
-                                    <span class="text-[10px] font-bold uppercase text-gray-400 tracking-widest">Application Status</span>
-                                    <div class="px-4 py-1.5 rounded-lg border text-sm font-bold
-                                        {% if job.user_status == 'Accepted' %}bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:border-green-800
-                                        {% elif job.user_status == 'Rejected' %}bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:border-red-800
-                                        {% else %}bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800{% endif %}">
-                                        {{ job.user_status }}
-                                    </div>
-                                </div>
-
+                                <div class="status-pill"><span>Application:</span> {{ job.user_status }}</div>
+                            
                             {% elif job.status == 0 and user.is_authenticated %}
                                 <form method="POST" action="">
                                     {% csrf_token %}
                                     <input type="hidden" name="job_id" value="{{ job.id }}">
-                                    <button type="submit" class="bg-gray-900 dark:bg-white dark:text-black text-white px-6 py-2 rounded-lg font-bold hover:scale-105 transition-transform shadow-md cursor-pointer">
-                                        Apply
-                                    </button>
+                                    <button type="submit" class="btn-action dark">Apply for Role</button>
                                 </form>
-                            {% else %}
-                                <span class="text-sm text-gray-400 italic">{{ job.get_status }}</span>
                             {% endif %}
                         </div>
                     </div>
                 </div>
             {% endfor %}
-        {% endif %}
-    {% endfor %}
+        {% endfor %}
     </div>
 
-    <div class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-400">
+    <footer class="detail-footer">
         <div class="space-y-1">
             <p>Created: {{ request.created_on|date:"h:i A | d M Y" }}</p>
             <p>Last Updated: {{ request.updated_on|date:"h:i A | d M Y" }}</p>
         </div>
-        <a href="{% url 'request_list' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 font-medium transition-colors">
-            Back to Requests
-        </a>
-    </div>
-</div>
+        <a href="{% url 'request_list' %}" class="link-back">Back to Requests</a>
+    </footer>
+</main>
 {% endblock %}

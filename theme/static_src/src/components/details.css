@@ -1,0 +1,61 @@
+@layer components {
+  .detail-container {
+    @apply max-w-4xl mx-auto p-6;
+
+    .link-back { @apply text-gray-600 dark:text-gray-400 hover:text-blue-600 font-medium transition-colors text-sm; }
+
+    .detail-header {
+      @apply flex justify-between items-center pb-4 mb-6 border-b border-gray-200 dark:border-gray-800;
+      
+      h1 { @apply text-2xl font-light italic text-gray-900 dark:text-gray-50 tracking-tight; }
+    }
+
+    .detail-hero {
+      @apply mb-8;
+      h2 { @apply text-3xl font-semibold text-gray-800 dark:text-gray-100 mb-1; }
+      p { @apply text-gray-600 dark:text-gray-400; }
+    }
+
+    .detail-body {
+      @apply text-lg leading-relaxed text-gray-700 dark:text-gray-300 mb-8 block;
+      
+      & p { @apply mb-4; }
+      & strong { @apply font-bold text-gray-900 dark:text-white; }
+      & a { @apply text-blue-600 underline hover:text-blue-800; }
+      & :is(ul, ol) { @apply pl-5 mb-4; }
+      & ul { @apply list-disc; }
+      & ol { @apply list-decimal; }
+    }
+
+    .section-label {
+      @apply flex items-center justify-between w-full mb-6;
+
+      h3 { @apply text-xl font-bold text-gray-900 dark:text-white m-0; }
+      .label-aux { @apply text-sm font-medium text-gray-500 italic; }
+    }
+
+    .info-card {
+      @apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200;
+      
+      h4 { @apply text-xl font-bold text-blue-600 dark:text-blue-400; }
+      &.variant-ghost { @apply bg-gray-50/50 dark:bg-gray-900/50 border-dashed; }
+    }
+
+    .status-pill {
+      @apply bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full border border-gray-200 dark:border-gray-700 text-sm inline-flex items-center;
+      
+      span { @apply text-gray-500 uppercase tracking-wider font-bold text-[10px] mr-1.5; }
+    }
+
+    .btn-action {
+      @apply px-4 py-2 font-semibold rounded-lg transition-all active:scale-95 shadow-sm inline-block cursor-pointer text-center;
+      
+      &.primary { @apply bg-blue-600 hover:bg-blue-700 text-white; }
+      &.dark { @apply bg-gray-900 dark:bg-white text-white dark:text-black hover:scale-105; }
+    }
+
+    .detail-footer {
+      @apply mt-12 pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-400;
+    }
+  }
+}

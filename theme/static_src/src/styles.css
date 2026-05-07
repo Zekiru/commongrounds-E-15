@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
+/* Components */
+@import "./components/forms.css";
+@import "./components/details.css";
+
 /**
   * A catch-all path to Django template files, JavaScript, and Python files
   * that contain Tailwind CSS classes and will be scanned by Tailwind to generate the final CSS file.
@@ -9,92 +13,3 @@
   * the scope of this path.
   */
 @source "../../../**/*.{html,py,js}";
-
-@utility django-form-container {
-  color: var(--color-gray-800);
-  
-  @variant dark {
-    color: var(--color-gray-200);
-  }
-
-  & input:not([type="checkbox"]), & select, & textarea {
-    width: 100%;
-    padding: 0.625rem; /* Equivalent to p-2.5 */
-    border: 2px solid var(--color-gray-300);
-    border-radius: var(--radius-lg);
-    background-color: var(--color-white);
-    color: var(--color-gray-900);
-    margin-top: 0.25rem;
-    margin-bottom: 0.75rem;
-    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 150ms;
-
-    @variant dark {
-      border-color: var(--color-gray-600);
-      background-color: var(--color-gray-800);
-      color: var(--color-gray-50);
-    }
-
-    &:disabled {
-      cursor: not-allowed;
-      background-color: var(--color-gray-100);
-      border-color: var(--color-gray-200);
-      color: var(--color-gray-400);
-      opacity: 0.7;
-      box-shadow: none; 
-    }
-  }
-
-  & textarea {
-    resize: vertical;
-    min-height: 80px;
-    align-self: flex-start;
-  }
-
-  & input[type="checkbox"] {
-    width: 1.25rem !important;
-    height: 1.25rem !important;
-    padding: 0 !important;
-    margin: 0 0.5rem 0 0 !important;
-    display: inline-block;
-    vertical-align: middle;
-    border: 2px solid var(--color-gray-600) !important;
-    accent-color: var(--color-indigo-600);
-
-    @variant dark {
-      border-color: var(--color-gray-400) !important;
-    }
-  }
-
-  & .errorlist {
-    list-style: none;
-    padding: 0;
-    margin: 0.25rem 0 0.75rem 0;
-    color: var(--color-red-600);
-    font-size: 0.875rem; /* text-sm */
-    font-weight: 500;
-
-    @variant dark {
-      color: var(--color-red-400);
-    }
-
-    & li {
-      margin-bottom: 0.125rem;
-    }
-  }
-
-  & .error input, & .error select, & .error textarea {
-    border-color: var(--color-red-500) !important;
-    background-color: var(--color-red-50);
-
-    @variant dark {
-      background-color: color-mix(in srgb, var(--color-red-950), transparent 80%);
-      border-color: var(--color-red-400) !important;
-    }
-  }
-
-  & ul {
-    margin: 1.5rem 0;
-  }
-}
