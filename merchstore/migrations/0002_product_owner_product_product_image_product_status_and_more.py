@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='product',
             name='status',
-            field=models.CharField(choices=[('Available', 'Available'), ('On sale', 'On sale'), ('Out of stock', 'Out of stock')], default='Available', max_length=3),
+            field=models.CharField(choices=[('Available', 'Available'), ('On sale', 'On sale'), ('Out of stock', 'Out of stock')], default='Available', max_length=20),
         ),
         migrations.AddField(
             model_name='product',
