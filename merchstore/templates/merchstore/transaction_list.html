@@ -1,32 +1,65 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% load static %}
 
-{% block title %}Transactions List{% endblock %}
+{% block title %}Your Sales{% endblock %}
 
 {% block content %}
-    <div class ="row">
-        <h2 class="align-left">Your Sales</h2>
-    </div>
+<main class="detail-container">
+    
+    <header class="detail-header">
+        <h1>Sales Dashboard</h1>
+        <a href="{% url 'merchstore_list' %}" class="link-back ml-15">
+            Back to Store
+        </a>
+    </header>
 
     {% if transactions %}
         {% regroup transactions by buyer as buyer_list %}
+        
+        <div class="space-y-10">
+            {% for group in buyer_list %}
+                <section>
+                    <div class="section-label">
+                        <h3>Buyer: {{ group.grouper.display_name|default:group.grouper }}</h3>
+                        <span class="label-aux">Purchases from your inventory</span>
+                    </div>
 
-        {% for group in buyer_list %}
-            <div class="row">
-                <h3 class="align-left">Buyer: {{ group.grouper.display_name }}</h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
+                        {% for transaction in group.list %}
+                            <div class="info-card flex justify-between items-center border-l-4 border-l-green-500">
+                                <div class="pr-4">
+                                    <h4 class="font-bold text-lg text-gray-900 dark:text-gray-100">
+                                        {{ transaction.product.name }}
+                                    </h4>
+                                    <div class="flex flex-wrap gap-x-6 gap-y-1 mt-1 text-sm text-gray-500">
+                                        <p>Qty: <span class="font-semibold text-gray-700 dark:text-gray-300">{{ transaction.amount }}</span></p>
+                                        <p>Status: <span class="font-medium text-green-600 dark:text-green-400">{{ transaction.get_status_display }}</span></p>
+                                        <p class="text-xs self-center">Ordered: {{ transaction.created_on|date:"M d, Y" }}</p>
+                                    </div>
+                                </div>
+                                <a href="{% url 'merchstore_detail' transaction.product.pk %}" class="btn-action dark text-sm whitespace-nowrap">
+                                    Product Page
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <div class="info-card py-20 text-center border-dashed border-2">
+            <p class="text-xl text-gray-500 dark:text-gray-400 italic">No sales transactions found.</p>
+            <div class="mt-8">
+                <a href="{% url 'merchstore_list' %}" class="btn-action primary">
+                    View Listings
+                </a>
             </div>
-            <div class="list-wrapper">
-                {% for transaction in group.list %}
-                <div class="list-item">
-                    <h3>{{ transaction.product.name }}</h3>
-                    <p><i>Amount: {{ transaction.amount }}</i></p> 
-                    <p>Status: {{ transaction.get_status_display }} </p>
-                    <p>Created on: {{ transaction.created_on }}</p>
-                </div>
-                {% endfor %}
-            </div>
-        {% endfor %}
-    {% else  %}
-        <p>No transactions found.</p>
+        </div>
     {% endif %}
-    <a href="{% url 'merchstore_list' %}" class="btn align-right">Back</a>
+
+    <footer class="detail-footer border-t border-gray-100 dark:border-gray-800 pt-8 mt-12">
+        <a href="{% url 'merchstore_list' %}" class="link-back">Back to Store</a>
+    </footer>
+</main>
 {% endblock %}

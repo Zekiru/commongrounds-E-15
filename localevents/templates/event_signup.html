@@ -1,52 +1,68 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Signup | {{ event.title }}{% endblock %}
 
 {% block content %}
-<div style="max-width: 800px; margin: 0 auto; padding: 40px 60px;">
+<main class="detail-container">
+    
+    <header class="detail-header">
+        <h1>Event Signup</h1>
+        <a href="{% url 'event_detail' event.id %}" class="link-back">
+            Cancel and Return
+        </a>
+    </header>
 
-    <div style="text-align: center; margin-bottom: 35px;">
-        <h2 style="font-weight: normal; color: #1e90ff; letter-spacing: 1px;">
-            EVENT SIGNUP
-        </h2>
+    <section class="section-label">
+        <h3>{{ event.title }}</h3>
+    </section>
+
+    <div class="info-card mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8 text-sm">
+            <div class="space-y-1">
+                <p class="text-xs font-bold uppercase tracking-wider text-gray-400">Location</p>
+                <p class="text-gray-900 dark:text-gray-100">{{ event.location }}</p>
+            </div>
+            <div class="space-y-1">
+                <p class="text-xs font-bold uppercase tracking-wider text-gray-400">Date & Time</p>
+                <p class="text-gray-900 dark:text-gray-100">
+                    {{ event.start_time|date:"M d, H:i" }} - {{ event.end_time|date:"H:i" }}
+                </p>
+            </div>
+            <div class="col-span-full pt-2">
+                <p class="text-xs font-bold uppercase tracking-wider text-gray-400">Description</p>
+                <p class="text-gray-600 dark:text-gray-400 mt-1 italic leading-relaxed">
+                    {{ event.description }}
+                </p>
+            </div>
+        </div>
     </div>
 
-    <hr>
+    <section class="section-label">
+        <h3>Join this Event</h3>
+    </section>
 
-    <h2 style="font-weight: normal; margin-top: 40px;">{{ event.title }}</h2>
+    <div class="info-card">
+        <form method="POST" class="django-form-container">
+            {% csrf_token %}
+            
+            <div class="space-y-4">
+                {{ form.as_p }}
+            </div>
 
-    <table style="width: 100%; border-collapse: collapse; margin-top: 25px;">
-        <tr>
-            <td style="border: 1px solid #ccc; padding: 15px;"><strong>Description</strong></td>
-            <td style="border: 1px solid #ccc; padding: 15px;">{{ event.description }}</td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid #ccc; padding: 15px;"><strong>Location</strong></td>
-            <td style="border: 1px solid #ccc; padding: 15px;">{{ event.location }}</td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid #ccc; padding: 15px;"><strong>Start</strong></td>
-            <td style="border: 1px solid #ccc; padding: 15px;">{{ event.start_time }}</td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid #ccc; padding: 15px;"><strong>End</strong></td>
-            <td style="border: 1px solid #ccc; padding: 15px;">{{ event.end_time }}</td>
-        </tr>
-    </table>
+            <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex flex-col md:flex-row items-center gap-4">
+                <button type="submit" class="btn-action primary w-full md:w-auto">
+                    Submit Signup
+                </button>
+                <a href="{% url 'event_detail' event.id %}" class="text-sm text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors">
+                    Discard
+                </a>
+            </div>
+        </form>
+    </div>
 
-    <h3 style="font-weight: normal; margin-top: 35px;">Sign Up</h3>
-
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-
-        <button type="submit"
-            style="background-color: #3498db; color: white; padding: 12px 30px; border: none; border-radius: 4px;">
-            Submit Signup
-        </button>
-    </form>
-
-    <p style="margin-top: 30px;">
-        <a href="{% url 'event_detail' event.id %}">Back to Event</a>
-    </p>
-
-</div>
+    <footer class="detail-footer mt-12">
+        <a href="{% url 'event_detail' event.id %}" class="link-back">Back to Event Details</a>
+    </footer>
+</main>
 {% endblock %}
