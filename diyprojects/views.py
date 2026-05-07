@@ -121,7 +121,7 @@ class ProjectCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     def test_func(self):
         if not hasattr(self.request.user, 'profile'):
             return False
-        return self.request.user.profile.role == 'Project Creator'
+        return self.request.user.profile.role == 'PC'
 
     def form_valid(self, form):
         form.instance.creator = self.request.user.profile
@@ -146,4 +146,4 @@ class ProjectUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
         profile = self.request.user.profile
         project = self.get_object()
-        return profile.role == 'Project Creator' and project.creator == profile
+        return profile.role == 'PC' and project.creator == profile

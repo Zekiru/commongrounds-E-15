@@ -5,115 +5,138 @@
 {% block content %}
 <div class="flex items-center justify-between flex-wrap gap-4 my-6">
     <h2 class="text-2xl font-light italic tracking-tight text-gray-900 dark:text-white">Local Events</h2>
-    <a href="{% url 'home' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 font-medium transition-colors">
+    <a href="{% url 'home' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors">
         Back to Home
     </a>
 </div>
 
-{% if user.profile.role == 'EO' %}
-<div class="flex justify-between mb-8">
-    <p class="text-gray-500 text-sm my-auto">Event Organizer</p>
+{% if user.is_authenticated and user.profile.role == 'EO' %}
+<div class="flex justify-end mb-4">
     <a href="{% url 'event_create' %}" 
-       class="px-6 py-3 font-semibold text-white bg-green-600 hover:bg-green-700 rounded-lg transition-all active:scale-95 cursor-pointer shadow-sm">
-        + Create Event
+       class="px-4 py-2 font-semibold text-white bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-400 rounded-lg transition-all active:scale-95 cursor-pointer shadow-sm">
+        + Organize New Event
     </a>
 </div>
 {% endif %}
 
 <div class="space-y-12">
-    
     {% if user.is_authenticated %}
-        {# Section: Events Created #}
+        {% if created_events %}
         <section>
             <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-1 border-gray-200 dark:border-gray-800">
-                Events You Created
+                Events You're Organizing
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {% for event in created_events %}
                     <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
                         <div>
-                            <div class="flex justify-between items-start gap-2 mb-3">
-                                <h4 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">{{ event.title }}</h4>
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 ring-1 ring-blue-700/10 dark:bg-blue-900/30 dark:text-blue-400 dark:ring-blue-400/20">
+                            <div class="flex justify-between items-start gap-2 mb-2">
+                                <h4 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">
+                                    {{ event.title }}
+                                </h4>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold 
+                                    {% if event.status == 'Available' %}bg-green-50 text-green-700 ring-green-700/10 dark:bg-green-900/30 dark:text-green-400
+                                    {% elif event.status == 'Full' %}bg-yellow-50 text-yellow-700 ring-yellow-700/10 dark:bg-yellow-900/30 dark:text-yellow-400
+                                    {% else %}bg-gray-50 text-gray-700 ring-gray-700/10 dark:bg-gray-800 dark:text-gray-400{% endif %} ring-1">
                                     {{ event.status }}
                                 </span>
                             </div>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">
                                 {{ event.location }}
                             </p>
+                            <p class="text-xs text-gray-400 uppercase tracking-wider">
+                                {{ event.start_time|date:"M d, Y @ H:i" }}
+                            </p>
                         </div>
-                        <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-end">
-                            <a href="{% url 'event_detail' event.id %}" class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors cursor-pointer active:scale-95">
-                                View Event
+                        <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
+                            <span class="text-sm italic text-gray-500 dark:text-gray-400">
+                                {{ event.category.name|default:"General" }}
+                            </span>
+                            <a href="{% url 'event_detail' event.id %}" class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 rounded-lg transition-all active:scale-95">
+                                View Details
                             </a>
                         </div>
                     </div>
-                {% empty %}
-                    <p class="col-span-full text-sm text-gray-500 italic">You have not created any events.</p>
                 {% endfor %}
             </div>
         </section>
+        {% endif %}
 
-        {# Section: Events Signed Up #}
+        {% if signed_up_events %}
         <section>
             <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-1 border-gray-200 dark:border-gray-800">
-                Events You Signed Up For
+                Your Upcoming Registrations
             </h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {% for event in signed_up_events %}
-                    <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+                    <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between border-l-4 border-l-blue-500">
                         <div>
-                            <div class="flex justify-between items-start gap-2 mb-3">
-                                <h4 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">{{ event.title }}</h4>
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-50 text-green-700 ring-1 ring-green-700/10 dark:bg-green-900/30 dark:text-green-400 dark:ring-green-400/20">
-                                    {{ event.status }}
-                                </span>
+                            <div class="flex justify-between items-start gap-2 mb-2">
+                                <h4 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">
+                                    {{ event.title }}
+                                </h4>
+                                <span class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase">Registered</span>
                             </div>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                            <p class="text-sm text-gray-500 dark:text-gray-400">
                                 {{ event.location }}
                             </p>
+                            <p class="text-xs text-gray-400 mt-1">
+                                {{ event.start_time|date:"D, M j" }}
+                            </p>
                         </div>
-                        <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-end">
-                            <a href="{% url 'event_detail' event.id %}" class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors cursor-pointer active:scale-95">
+                        <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
+                            <span class="text-sm italic text-gray-500 dark:text-gray-400">
+                                {{ event.category.name }}
+                            </span>
+                            <a href="{% url 'event_detail' event.id %}" class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 rounded-lg transition-all active:scale-95">
                                 View Event
                             </a>
                         </div>
                     </div>
-                {% empty %}
-                    <p class="col-span-full text-sm text-gray-500 italic">You have not signed up for any events.</p>
                 {% endfor %}
             </div>
         </section>
+        {% endif %}
     {% endif %}
 
-    {# Section: All Events #}
     <section>
         <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-1 border-gray-200 dark:border-gray-800">
-            All Events
+            Discover Events
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             {% for event in events %}
                 <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
                     <div>
-                        <div class="flex justify-between items-start gap-2 mb-3">
-                            <h4 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">{{ event.title }}</h4>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-700 ring-1 ring-gray-700/10 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-300/20">
+                        <div class="flex justify-between items-start gap-2 mb-2">
+                            <h4 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">
+                                {{ event.title }}
+                            </h4>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold 
+                                {% if event.status == 'Available' %}bg-green-50 text-green-700 ring-green-700/10 dark:bg-green-900/30 dark:text-green-400
+                                {% elif event.status == 'Full' %}bg-yellow-50 text-yellow-700 ring-yellow-700/10 dark:bg-yellow-900/30 dark:text-yellow-400
+                                {% else %}bg-gray-50 text-gray-700 ring-gray-700/10 dark:bg-gray-800 dark:text-gray-400{% endif %} ring-1">
                                 {{ event.status }}
                             </span>
                         </div>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                        <p class="text-sm text-gray-500 dark:text-gray-400">
                             {{ event.location }}
                         </p>
+                        <p class="text-xs text-gray-400 mt-1">
+                            Capacity: {{ event.event_capacity }}
+                        </p>
                     </div>
-                    <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-end">
-                        <a href="{% url 'event_detail' event.id %}" class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors cursor-pointer active:scale-95">
-                            View Event
+                    <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
+                        <span class="text-sm italic text-gray-500 dark:text-gray-400">
+                            {{ event.category.name|default:"General" }}
+                        </span>
+                        <a href="{% url 'event_detail' event.id %}" class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 rounded-lg transition-all active:scale-95">
+                            View Details
                         </a>
                     </div>
                 </div>
             {% empty %}
                 <div class="col-span-full text-center py-12 bg-gray-50 dark:bg-gray-900/50 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-800">
-                    <p class="text-gray-500 dark:text-gray-400">No events available yet.</p>
+                    <p class="text-gray-500 dark:text-gray-400">No events currently scheduled.</p>
                 </div>
             {% endfor %}
         </div>
