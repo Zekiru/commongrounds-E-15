@@ -21,6 +21,7 @@
 
 <div class="space-y-12">
     {% if user.is_authenticated %}
+        <!-- Section: Created Projects -->
         {% if created_projects %}
         <section>
             <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-1 border-gray-200 dark:border-gray-800">
@@ -49,6 +50,7 @@
         </section>
         {% endif %}
 
+        <!-- Section: Favorited Projects -->
         {% if favorited_projects %}
         <section>
             <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-1 border-gray-200 dark:border-gray-800">
@@ -78,8 +80,37 @@
             </div>
         </section>
         {% endif %}
+
+        <!-- NEW Section: Reviewed Projects (This is where your project went) -->
+        {% if reviewed_projects %}
+        <section>
+            <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-1 border-gray-200 dark:border-gray-800">
+                Projects You Reviewed
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for project in reviewed_projects %}
+                    <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between border-l-4 border-l-blue-500">
+                        <div>
+                            <h4 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight mb-2">
+                                {{ project.title }}
+                            </h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                Status: <span class="font-medium text-blue-600 dark:text-blue-400">Rated & Commented</span>
+                            </p>
+                        </div>
+                        <div class="flex items-center justify-end mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
+                            <a href="{{ project.get_absolute_url }}" class="px-4 py-2 text-sm font-semibold text-white bg-gray-800 hover:bg-black dark:bg-gray-700 dark:hover:bg-gray-600 rounded-lg transition-all active:scale-95">
+                                View Again
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
     {% endif %}
 
+    <!-- Section: Explore Projects -->
     <section>
         <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-1 border-gray-200 dark:border-gray-800">
             Explore Projects

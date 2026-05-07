@@ -1,20 +1,58 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}
-    {% if object %}Edit {{ object.title }}{% else %}Create New Project{% endif %}
+    {% if object %}Edit Project: {{ object.title }}{% else %}Start New Project{% endif %}
 {% endblock %}
 
 {% block content %}
-    <h2>{% if object %}Update Project{% else %}Add New Project{% endif %}</h2>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn">
-            {% if object %}Update{% else %}Create{% endif %}
-        </button>
-    </form>
-    <br>
-    <a href="{% if object %}{% url 'diyprojects:project_detail' object.pk %}{% else %}{% url 'diyprojects:project_list' %}{% endif %}">
-        Cancel
-    </a>
+<main class="detail-container">
+    
+    <header class="detail-header">
+        <h1>
+            {% if object %}Update DIY Project{% else %}Create New Project{% endif %}
+        </h1>
+        <a href="{% if object %}{% url 'diyprojects:project_detail' object.pk %}{% else %}{% url 'diyprojects:project_list' %}{% endif %}" 
+           class="link-back">
+            Cancel and Return
+        </a>
+    </header>
+
+    <section class="section-label">
+        <h3>Project Details</h3>
+        <span class="label-aux">General information and guide settings</span>
+    </section>
+
+    <div class="info-card">
+        <form method="POST" enctype="multipart/form-data" class="django-form-container">
+            {% csrf_token %}
+            
+            {{ form.as_p }}
+
+            <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex flex-col md:flex-row items-center gap-4">
+                <button type="submit" class="btn-action primary w-full md:w-auto">
+                    {% if object %}Save Changes{% else %}Publish Project{% endif %}
+                </button>
+                
+                {% if object %}
+                    <a href="{% url 'diyprojects:project_detail' object.pk %}" class="text-sm text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors">
+                        Discard Edits
+                    </a>
+                {% else %}
+                    <a href="{% url 'diyprojects:project_list' %}" class="text-sm text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors">
+                        Cancel
+                    </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <footer class="detail-footer">
+        <div class="space-y-1">
+            <p>Guidelines: Ensure your instructions are clear and safety precautions are noted.</p>
+            <p>Drafting: You can edit or add steps to your guide after the project is created.</p>
+        </div>
+        <a href="{% url 'diyprojects:project_list' %}" class="link-back">Back to Project Workshop</a>
+    </footer>
+</main>
 {% endblock %}

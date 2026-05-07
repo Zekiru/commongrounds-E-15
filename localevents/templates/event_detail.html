@@ -1,123 +1,137 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Event | {{ event.title }}{% endblock %}
 
 {% block content %}
-<div style="max-width: 900px; margin: 0 auto; padding: 40px 60px;">
+<main class="detail-container">
+    
+    <header class="detail-header">
+        <h1>Event Details</h1>
+        <a href="{% url 'event_list' %}" class="link-back">Back to Events</a>
+    </header>
 
-    <div style="text-align: center; margin-bottom: 35px;">
-        <h2 style="font-weight: normal; color: #1e90ff; letter-spacing: 1px;">
-            LOCAL EVENTS
-        </h2>
+    <section class="detail-hero">
+        <div class="flex flex-col md:flex-row gap-8 items-start">
+            {% if event.event_image %}
+                <div class="w-full md:w-1/3 shrink-0">
+                    <img src="{{ event.event_image.url }}" 
+                         alt="{{ event.title }}" 
+                         class="rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm object-cover w-full aspect-video md:aspect-square">
+                </div>
+            {% endif %}
+
+            <div class="flex-1">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase text-blue-600 dark:text-blue-400 tracking-widest mb-1 block">
+                            {% if event.category %}{{ event.category.name }}{% else %}General Event{% endif %}
+                        </span>
+                        <h2>{{ event.title }}</h2>
+                        <p class="text-gray-500">Organized by 
+                            <span class="font-medium text-gray-900 dark:text-gray-100">
+                                {% for organizer in event.organizer.all %}
+                                    {{ organizer.display_name }}{% if not forloop.last %}, {% endif %}
+                                {% empty %}
+                                    Anonymous
+                                {% endfor %}
+                            </span>
+                        </p>
+                    </div>
+                    {% if is_organizer %}
+                        <a href="{% url 'event_update' event.id %}" class="btn-action primary text-sm text-nowrap">Edit Event</a>
+                    {% endif %}
+                </div>
+
+                <div class="mt-6 flex flex-wrap gap-3">
+                    <div class="status-pill">
+                        <span>Status:</span> 
+                        <b class="{% if event.status == 'Available' %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %}">
+                            {{ event.status }}
+                        </b>
+                    </div>
+                    <div class="status-pill">
+                        <span>Capacity:</span> {{ signup_count }} / {{ event.event_capacity }}
+                    </div>
+                    <div class="status-pill">
+                        <span>Location:</span> {{ event.location }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <article class="detail-body">
+        <div class="info-card variant-ghost mb-8 py-4 flex flex-wrap gap-x-12 gap-y-4">
+            <div>
+                <span class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Start Time</span>
+                <p class="text-sm font-medium">{{ event.start_time|date:"D, M d, Y" }} @ {{ event.start_time|date:"P" }}</p>
+            </div>
+            <div>
+                <span class="text-[10px] font-bold uppercase text-gray-400 block mb-1">End Time</span>
+                <p class="text-sm font-medium">{{ event.end_time|date:"D, M d, Y" }} @ {{ event.end_time|date:"P" }}</p>
+            </div>
+        </div>
+        
+        {{ event.description|linebreaks }}
+    </article>
+
+    <hr class="border-gray-200 dark:border-gray-800 my-8">
+
+    <section class="section-label">
+        <h3>Attendance</h3>
+        <span class="label-aux">Registration & Signups</span>
+    </section>
+
+    <div class="grid md:grid-cols-3 gap-8">
+        <div class="md:col-span-1">
+            {% if is_organizer %}
+                <div class="info-card bg-gray-50 dark:bg-gray-900/50">
+                    <p class="text-sm text-center text-gray-500 italic">You are an organizer for this event.</p>
+                </div>
+            {% elif is_full %}
+                <div class="info-card border-red-100 dark:border-red-900/30">
+                    <button disabled class="btn-action dark w-full opacity-50 cursor-not-allowed">Event Full</button>
+                    <p class="text-[11px] text-center mt-3 text-red-500 font-medium uppercase tracking-tight">Maximum capacity reached</p>
+                </div>
+            {% else %}
+                <div class="info-card">
+                    {% if user.is_authenticated %}
+                        <form method="POST" action="{% url 'event_signup' event.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-action primary w-full">Sign Up Now</button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'event_signup' event.id %}" class="btn-action primary w-full text-center">Sign Up as Guest</a>
+                    {% endif %}
+                    <p class="text-[11px] text-center mt-3 text-gray-400 uppercase tracking-tight">Secure your spot</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="md:col-span-2">
+            <div class="info-card variant-ghost">
+                <h4 class="text-sm! mb-4">Registered Guests</h4>
+                <ul class="space-y-2">
+                    {% for signup in signups %}
+                        <li class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                            <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                            {{ signup }}
+                        </li>
+                    {% empty %}
+                        <li class="text-gray-400 italic text-sm">No signups yet.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
     </div>
 
-    <hr>
-
-    <h2 style="font-weight: normal; margin-top: 40px;">{{ event.title }}</h2>
-
-    {% if event.event_image %}
-    <div style="margin: 25px 0;">
-        <img src="{{ event.event_image.url }}" alt="{{ event.title }}" style="max-width: 300px;">
-    </div>
-    {% endif %}
-
-    <p>
-        <strong>Status:</strong>
-        {% if event.status == 'Full' or event.status == 'Cancelled' or event.status == 'Done' %}
-        <span style="color: red;">{{ event.status }}</span>
-        {% else %}
-        <span style="color: green;">{{ event.status }}</span>
-        {% endif %}
-    </p>
-
-    <p><strong>Category</strong></p>
-    <p>
-        {% if event.category %}
-        {{ event.category.name }}
-        {% else %}
-        None
-        {% endif %}
-    </p>
-
-    <table style="width: 100%; border-collapse: collapse; margin-top: 25px;">
-        <tr>
-            <td style="border: 1px solid #ccc; padding: 15px;"><strong>Description</strong></td>
-            <td style="border: 1px solid #ccc; padding: 15px;">{{ event.description }}</td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid #ccc; padding: 15px;"><strong>Location</strong></td>
-            <td style="border: 1px solid #ccc; padding: 15px;">{{ event.location }}</td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid #ccc; padding: 15px;"><strong>Start</strong></td>
-            <td style="border: 1px solid #ccc; padding: 15px;">{{ event.start_time }}</td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid #ccc; padding: 15px;"><strong>End</strong></td>
-            <td style="border: 1px solid #ccc; padding: 15px;">{{ event.end_time }}</td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid #ccc; padding: 15px;"><strong>Capacity</strong></td>
-            <td style="border: 1px solid #ccc; padding: 15px;">{{ signup_count }} / {{ event.event_capacity }}</td>
-        </tr>
-        <tr>
-            <td style="border: 1px solid #ccc; padding: 15px;"><strong>Organizer</strong></td>
-            <td style="border: 1px solid #ccc; padding: 15px;">
-                {% for organizer in event.organizer.all %}
-                {{ organizer.display_name }}
-                {% empty %}
-                None
-                {% endfor %}
-            </td>
-        </tr>
-    </table>
-
-    <div style="text-align: center; margin: 35px 0;">
-        {% if is_organizer %}
-        <a href="{% url 'event_update' event.id %}"
-            style="background-color: #3498db; color: white; padding: 12px 28px; text-decoration: none; border-radius: 4px;">
-            Edit Event
-        </a>
-        <p style="margin-top: 20px;">You cannot sign up for your own event.</p>
-        {% else %}
-        {% if is_full %}
-        <button disabled
-            style="background-color: gray; color: white; padding: 12px 28px; border: none; border-radius: 4px;">
-            Sign Up
-        </button>
-        <p>This event is full.</p>
-        {% else %}
-        {% if user.is_authenticated %}
-        <form method="POST" action="{% url 'event_signup' event.id %}">
-            {% csrf_token %}
-            <button type="submit"
-                style="background-color: #3498db; color: white; padding: 12px 28px; border: none; border-radius: 4px;">
-                Sign Up
-            </button>
-        </form>
-        {% else %}
-        <a href="{% url 'event_signup' event.id %}"
-            style="background-color: #3498db; color: white; padding: 12px 28px; text-decoration: none; border-radius: 4px;">
-            Sign Up
-        </a>
-        {% endif %}
-        {% endif %}
-        {% endif %}
-    </div>
-
-    <hr>
-
-    <h3 style="font-weight: normal;">Signups</h3>
-
-    <ul>
-        {% for signup in signups %}
-        <li>{{ signup }}</li>
-        {% empty %}
-        <li>No signups yet.</li>
-        {% endfor %}
-    </ul>
-
-    <p style="margin-top: 30px;">
-        <a href="{% url 'event_list' %}">Back to Events</a>
-    </p>
-
-</div>
+    <footer class="detail-footer">
+        <div class="space-y-1">
+            <p>Posted: {{ event.created_on|date:"M d, Y" }}</p>
+            <p>Event ID: #EV-{{ event.id|stringformat:"04d" }}</p>
+        </div>
+        <a href="{% url 'event_list' %}" class="link-back">Back to Events</a>
+    </footer>
+</main>
 {% endblock %}

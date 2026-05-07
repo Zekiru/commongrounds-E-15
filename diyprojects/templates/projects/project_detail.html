@@ -1,74 +1,126 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}DIY Project Details{% endblock %}
+{% block title %}Project | {{ project.title }}{% endblock %}
 
 {% block content %}
-    <h1>{{ project.title }}</h1>
-    <p><strong>Creator:</strong> {{ project.creator.display_name }}</p>
+<main class="detail-container">
     
-    {% if is_creator %}
-    <div class="owner-actions">
-        <a href="{% url 'diyprojects:project_update' project.pk %}" class="btn">Edit Project</a>
-    </div>
-    {% endif %}
+    <header class="detail-header">
+        <h1>Project Details</h1>
+        <a href="{% url 'diyprojects:project_list' %}" class="link-back">Back to Projects</a>
+    </header>
 
-    <hr>
+    <section class="detail-hero">
+        <div class="flex flex-col md:flex-row justify-between items-start gap-6">
+            <div class="flex-1">
+                <span class="text-[10px] font-bold uppercase text-blue-600 dark:text-blue-400 tracking-widest mb-1 block">
+                    {{ project.category.name|default:"General DIY" }}
+                </span>
+                <h2>{{ project.title }}</h2>
+                <p class="text-gray-500">Designed by 
+                    <span class="font-medium text-gray-900 dark:text-gray-100">{{ project.creator.display_name }}</span>
+                </p>
+            </div>
 
-    <div class="project-info">
-        <h3>Category: {{ project.category.name|default:"None" }}</h3>
-        <p>{{ project.description }}</p>
-        
-        <h4>Materials</h4>
-        <p>{{ project.materials }}</p>
-        
-        <h4>Steps</h4>
-        <p>{{ project.steps }}</p>
-    </div>
-    <hr>
-
-    <div class="stat-section">
-        <h4>Average Rating:</h4> 
-        <p>{{ average_rating }}/10</p>
-
-        <h4><strong>Favorited by:</h4> 
-        <p>{{ favorites_count }} users</p>
-    </div>
-    <hr>
-
-    {% if user.is_authenticated %}
-        <div class="form-section">
-            <h3>Rate this Project</h3>
-            <form method="POST">
-                {% csrf_token %}
-                {{ rating_form.as_p }}
-                <button type="submit" name="submit_rating" class="btn">Submit Rating</button>
-            </form>
-
-            <h3>Write a Review</h3>
-            <form method="POST">
-                {% csrf_token %}
-                {{ review_form.as_p }}
-                <button type="submit" name="submit_review" class="btn">Submit Review</button>
-            </form>
-        </div>
-    {% endif %}
-    <hr>
-
-    <h3>Reviews</h3>
-    <div class="reviews-list">
-        {% for review in reviews %}
-            <div class="review-card">
-                <h4>{{ review.reviewer.display_name }}:</h4> 
-                <p>{{ review.comment }}</p>
-                
-                {% if review.image %}
-                    <img src="{{ review.image.url }}" alt="Review Image" style="max-width: 200px;">
+            <div class="flex shrink-0 gap-3">
+                <div class="status-pill">
+                    <span>Rating:</span> <b>{{ average_rating|default:"- " }}/10</b>
+                </div>
+                <div class="status-pill">
+                    <span>Favorites:</span> <b>{{ favorites_count }}</b>
+                </div>
+                {% if is_creator %}
+                    <a href="{% url 'diyprojects:project_update' project.pk %}" class="btn-action primary text-sm">Edit Project</a>
                 {% endif %}
             </div>
+        </div>
+    </section>
+
+    <article class="detail-body">
+        <section class="mb-10">
+            <h3 class="text-lg font-semibold mb-3">Description</h3>
+            <div class="text-gray-700 dark:text-gray-300 leading-relaxed">
+                {{ project.description|linebreaks }}
+            </div>
+        </section>
+
+        <div class="grid md:grid-cols-2 gap-8">
+            <section class="info-card variant-ghost">
+                <h4 class="text-sm! font-bold uppercase tracking-tight mb-4 text-blue-600">Materials Needed</h4>
+                <div class="text-sm whitespace-pre-line">{{ project.materials }}</div>
+            </section>
+
+            <section class="info-card variant-ghost">
+                <h4 class="text-sm! font-bold uppercase tracking-tight mb-4 text-green-600">Instructions</h4>
+                <div class="text-sm whitespace-pre-line">{{ project.steps }}</div>
+            </section>
+        </div>
+    </article>
+
+    <hr class="border-gray-200 dark:border-gray-800 my-12">
+
+    {% if user.is_authenticated and not is_creator %}
+    <section class="section-label">
+        <h3>Community Action</h3>
+        <span class="label-aux">Share your progress or rate this build</span>
+    </section>
+
+    <div class="grid md:grid-cols-3 gap-8 mb-12">
+        <div class="md:col-span-1">
+            <div class="info-card">
+                <h4 class="text-sm! mb-4">Your Rating</h4>
+                <form method="POST" class="django-form-container">
+                    {% csrf_token %}
+                    {{ rating_form.as_p }}
+                    <button type="submit" name="submit_rating" class="btn-action primary w-full mt-4">Save Rating</button>
+                </form>
+            </div>
+        </div>
+        <div class="md:col-span-2">
+            <div class="info-card">
+                <h4 class="text-sm! mb-4">Post a Review</h4>
+                <form method="POST" enctype="multipart/form-data" class="django-form-container">
+                    {% csrf_token %}
+                    {{ review_form.as_p }}
+                    <button type="submit" name="submit_review" class="btn-action primary w-full mt-4">Submit Review</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <section class="section-label">
+        <h3>Community Reviews</h3>
+        <span class="label-aux">{{ reviews.count }} response{{ reviews.count|pluralize }}</span>
+    </section>
+
+    <div class="space-y-6">
+        {% for review in reviews %}
+            <div class="info-card variant-ghost flex flex-col md:flex-row gap-6">
+                {% if review.image %}
+                    <div class="w-full md:w-48 shrink-0">
+                        <img src="{{ review.image.url }}" alt="Review result" class="rounded-lg object-cover aspect-square w-full">
+                    </div>
+                {% endif %}
+                <div class="flex-1">
+                    <p class="font-bold text-gray-900 dark:text-gray-100 mb-2">{{ review.reviewer.display_name }}</p>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{{ review.comment }}</p>
+                </div>
+            </div>
         {% empty %}
-            <p>No reviews yet.</p>
+            <div class="text-center py-12 border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-2xl">
+                <p class="text-gray-400 italic">No reviews yet. Be the first to build this!</p>
+            </div>
         {% endfor %}
     </div>
 
-    <a href="{% url 'diyprojects:project_list' %}" class="btn align-right">Back to List</a>
+    <footer class="detail-footer">
+        <div class="space-y-1">
+            <p>Project created: {{ project.created_on|date:"M d, Y" }}</p>
+            <p>Last updated: {{ project.updated_on|date:"M d, Y" }}</p>
+        </div>
+        <a href="{% url 'diyprojects:project_list' %}" class="link-back">Return to Projects</a>
+    </footer>
+</main>
 {% endblock %}
