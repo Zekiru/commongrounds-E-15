@@ -20,7 +20,9 @@ def event_list(request):
     if request.user.is_authenticated:
         profile = request.user.profile
         created_events = Event.objects.filter(organizer=profile)
-        signed_up_events = Event.objects.filter(signups__user_registrant=profile)
+        signed_up_events = Event.objects.filter(
+            signups__user_registrant=profile
+        )
         all_events = Event.objects.exclude(organizer=profile).exclude(
             signups__user_registrant=profile
         )
@@ -143,10 +145,6 @@ class BaseSignupView(View):
 
 
 class EventSignupView(BaseSignupView):
-    """
-    Displays the signup form for anonymous users or handles 
-    direct signup for authenticated users.
-    """
     def get(self, request, event_id):
         try:
             event = Event.objects.get(id=event_id)
@@ -154,7 +152,10 @@ class EventSignupView(BaseSignupView):
             raise Http404("Event does not exist")
 
         if request.user.is_authenticated:
-            if EventSignup.objects.filter(event=event, user_registrant=request.user.profile).exists():
+            if EventSignup.objects.filter(
+                event=event,
+                user_registrant=request.user.profile
+            ).exists():
                 return redirect('event_detail', event_id=event.id)
 
         form = EventSignupForm()

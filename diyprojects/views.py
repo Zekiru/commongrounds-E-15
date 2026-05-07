@@ -3,7 +3,12 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Project, Favorite, ProjectRating
 from .repositories import ProjectRepository
-from .forms import ProjectCreateForm, ProjectUpdateForm, ProjectReviewForm, ProjectRatingForm
+from .forms import (
+    ProjectCreateForm,
+    ProjectUpdateForm,
+    ProjectReviewForm,
+    ProjectRatingForm
+)
 
 
 def index(request):
@@ -25,7 +30,9 @@ class ProjectListView(ListView):
         context = super().get_context_data(**kwargs)
         all_projects = list(self.get_queryset())
 
-        if self.request.user.is_authenticated and hasattr(self.request.user, 'profile'):
+        if self.request.user.is_authenticated and hasattr(
+            self.request.user, 'profile'
+        ):
             profile = self.request.user.profile
             context['created_projects'] = list(
                 self.repo.get_projects_created_by(profile))
@@ -67,7 +74,9 @@ class ProjectDetailView(DetailView):
         context['reviews'] = self.repo.get_project_reviews(project)
         context['is_creator'] = False
 
-        if self.request.user.is_authenticated and hasattr(self.request.user, 'profile'):
+        if self.request.user.is_authenticated and hasattr(
+            self.request.user, 'profile'
+        ):
             profile = self.request.user.profile
             context['is_creator'] = (project.creator == profile)
             context['review_form'] = ProjectReviewForm(user=self.request.user)

@@ -22,7 +22,7 @@ class ProfileDashboardView(LoginRequiredMixin, TemplateView):
         context['books'] = Book.objects.filter(contributor=profile)
         context['projects'] = Project.objects.filter(creator=profile)
         context['commissions'] = Commission.objects.filter(maker=profile)
-        
+
         return context
 
 
