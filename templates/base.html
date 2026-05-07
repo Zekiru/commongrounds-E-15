@@ -36,8 +36,8 @@
                 <a href="/" class="text-blue-600 font-medium">Home</a>
                 {% if user.is_authenticated %}
                     <!-- Dashboard -->
-                    {% if request.path != '/accounts/'|add:user.username|add:'/' %}
-                    <a href="#" class="text-blue-600 font-medium">Dashboard</a>
+                    {% if request.path != '/accounts/dashboard/' %}
+                    <a href="{% url 'dashboard' %}" class="text-blue-600 font-medium">Dashboard</a>
                     {% endif %}
                     <!-- Edit Profile -->
                     {% if request.path != '/accounts/edit/'|add:user.username|add:'/' %}
