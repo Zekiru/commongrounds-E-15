@@ -34,7 +34,7 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://commongrounds-E-15-production.up.railway.app",
+    "https://commongrounds-e-15-production.up.railway.app",
 ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
