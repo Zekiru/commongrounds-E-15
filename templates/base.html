@@ -1,66 +1,93 @@
 {% load static %}
+{% load static tailwind_tags %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <title>{% block title %}Common Grounds{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}"
-    type="text/css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    {% tailwind_css %}
     {% block styles %}{% endblock %}
+
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+    <script src="{% static 'js/darkmode.js' %}" defer></script>
 </head>
-<body>
-    <header>
-        <a href="/"><h1>Common Grounds</h1></a>
-        <hr>
+<body class="dark:bg-[#0a0a0a] dark:text-[#e0e0e0]  bg-[#fafafa] text-[#2c3e50] font-sans leading-relaxed p-0 m-0 transition-all duration-200 ease-in-out">
+    
+    <header class="px-15 py-6.5 flex flex-row flex-wrap gap-6 items-center">
+        <a href="/" class="mr-auto">
+            <h1 class="text-[2.2rem] font-light my-auto text-left tracking-tight text-[#1a1a1a] dark:text-[#fafafa]">Common Grounds</h1>
+        </a>
+        <div class="p-0 relative inline-block">
+            <!-- Header Buttons -->
+            <div class="flex flex-row flex-wrap space-x-4 gap-5">
+                <!-- Home -->
+                <a href="/" class="text-blue-600 font-medium">Home</a>
+                {% if user.is_authenticated %}
+                    <!-- Dashboard -->
+                    {% if request.path != '/accounts/dashboard/' %}
+                    <a href="{% url 'dashboard' %}" class="text-blue-600 font-medium">Dashboard</a>
+                    {% endif %}
+                    <!-- Edit Profile -->
+                    {% if request.path != '/accounts/edit/'|add:user.username|add:'/' %}
+                    <a href="{% url 'update' user.username %}" class="text-blue-600 font-medium">Edit Profile</a>
+                    {% endif %}
+                    <!-- Logout -->
+                    <form method="POST" action="{% url 'logout' %}" class="m-0 h-full flex items-center">
+                        {% csrf_token %}
+                        <button type="submit"
+                                class="text-red-600 font-medium hover:cursor-pointer"
+                        >Logout</button>
+                    </form>
+                {% elif request.path != '/accounts/login/' %}
+                    <!-- Login -->
+                    <a href="{% url 'login' %}" class="text-blue-600 font-medium">Login</a>
+                {% endif %}
+            </div>
+        </div>
     </header>
-    <nav>
-        {% if user.is_authenticated %}
-            <div class="nav-left">
-                <p>Welcome, 
-                    <b>{{ user.profile.display_name|default:user.username }}</b>!
-                </p>
-                <p>Role - 
-                    <b>{{ user.profile.get_role_display }}</b>
-                </p>
-            </div>
-            
-            <div class="nav-right">
-                <!-- TO-DO: Add dashboard link -->
-                {% if request.path != '/accounts/'|add:user.username|add:'/' %}
-                <a class="btn"
-                href="/"
-                >Dashboard</a>
-                {% endif %}
 
-                {% if request.path != '/accounts/edit/'|add:user.username|add:'/' %}
-                <a class="btn"
-                href="{% url 'update' user.username %}"
-                >Edit Profile</a>
-                {% endif %}
-
-                <form method="POST" action="{% url 'logout' %}"
-                class="form-btn">
-                    {% csrf_token %}
-                    <button type="submit"
-                    class="logout-btn">Logout</button>
-                </form>
-            </div>
-        {% else %}
-            {% if request.path != '/accounts/login/' %}
-            <div class="nav-mid">
-                <a class="btn"
-                href="{% url 'login' %}">Login</a>
-            </div>
+    <nav class="sticky top-0 px-15 py-4 flex flex-row flex-wrap gap-6 mx-auto items-center z-50 bg-[#0f39ad] backdrop-blur-sm text-white">
+        <div class="mr-auto flex flex-row flex-wrap gap-8">
+            {% if user.is_authenticated %}
+            <p>Welcome, 
+                <strong>{{ user.profile.display_name|default:user.username }}</strong>!
+            </p>
+            <p>Role - 
+                <strong>{{ user.profile.get_role_display }}</strong>
+            </p>
+            {% else %}
+            <p>Welcome, <strong>Guest</strong> User!</p>
             {% endif %}
-        {% endif %}
+        </div>
+        <div class="flex flex-row flex-wrap gap-10 font-semibold">
+            <button id="darkmode-btn" 
+            class="px-2 py-1 hover:cursor-pointer hover:bg-gray-700 bg-gray-800 rounded-xl transition-all duration-200 ease-in-out 
+            dark:bg-gray-300 dark:hover:bg-gray-400 dark:text-black">Dark Mode</button>
+        </div>
     </nav>
+    
     <br>
-    <div id="content">
+    
+    <div id="content" class="max-w-[915px] px-15 mx-auto flex flex-col gap-4">
         {% block content %}{% endblock %}
     </div>
-    <footer>
+    
+    <footer class="my-8 text-center text-[#999] text-sm italic font-semibold">
         <p>CSCI 40 | E-15</p>
     </footer>
+
     {% block scripts %}{% endblock %}
 </body>
 </html>

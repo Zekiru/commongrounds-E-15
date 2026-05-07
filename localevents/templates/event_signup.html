@@ -1,24 +1,68 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Event Signup</title>
-</head>
-<body>
-    <h1>Sign Up for {{ event.title }}</h1>
+{% extends "base.html" %}
+{% load static %}
 
-    <p><strong>Description:</strong> {{ event.description }}</p>
-    <p><strong>Location:</strong> {{ event.location }}</p>
-    <p><strong>Start:</strong> {{ event.start_time }}</p>
-    <p><strong>End:</strong> {{ event.end_time }}</p>
+{% block title %}Signup | {{ event.title }}{% endblock %}
 
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Sign Up</button>
-    </form>
+{% block content %}
+<main class="detail-container">
+    
+    <header class="detail-header">
+        <h1>Event Signup</h1>
+        <a href="{% url 'event_detail' event.id %}" class="link-back">
+            Cancel and Return
+        </a>
+    </header>
 
-    <p>
-        <a href="{% url 'event_detail' event.id %}">Back to Event</a>
-    </p>
-</body>
-</html>
+    <section class="section-label">
+        <h3>{{ event.title }}</h3>
+    </section>
+
+    <div class="info-card mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8 text-sm">
+            <div class="space-y-1">
+                <p class="text-xs font-bold uppercase tracking-wider text-gray-400">Location</p>
+                <p class="text-gray-900 dark:text-gray-100">{{ event.location }}</p>
+            </div>
+            <div class="space-y-1">
+                <p class="text-xs font-bold uppercase tracking-wider text-gray-400">Date & Time</p>
+                <p class="text-gray-900 dark:text-gray-100">
+                    {{ event.start_time|date:"M d, H:i" }} - {{ event.end_time|date:"H:i" }}
+                </p>
+            </div>
+            <div class="col-span-full pt-2">
+                <p class="text-xs font-bold uppercase tracking-wider text-gray-400">Description</p>
+                <p class="text-gray-600 dark:text-gray-400 mt-1 italic leading-relaxed">
+                    {{ event.description }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <section class="section-label">
+        <h3>Join this Event</h3>
+    </section>
+
+    <div class="info-card">
+        <form method="POST" class="django-form-container">
+            {% csrf_token %}
+            
+            <div class="space-y-4">
+                {{ form.as_p }}
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex flex-col md:flex-row items-center gap-4">
+                <button type="submit" class="btn-action primary w-full md:w-auto">
+                    Submit Signup
+                </button>
+                <a href="{% url 'event_detail' event.id %}" class="text-sm text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors">
+                    Discard
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <footer class="detail-footer mt-12">
+        <a href="{% url 'event_detail' event.id %}" class="link-back">Back to Event Details</a>
+    </footer>
+</main>
+{% endblock %}

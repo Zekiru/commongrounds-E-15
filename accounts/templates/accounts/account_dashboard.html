@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Dashboard{% endblock %}
+
+{% block content %}
+<main class="detail-container">
+    
+    <header class="detail-header">
+        <h2 class="text-2xl font-light italic tracking-tight text-gray-900 dark:text-white">Dashboard</h2>
+        <a href="{% url 'home' %}" class="link-back">Back to Home</a>
+    </header>
+
+    <div class="space-y-12 mt-8">
+        
+        <!-- Products -->
+        <section>
+            <div class="section-label">
+                <h3>Products</h3>
+                <span class="label-aux">{{ products.count }} Items in MerchStore</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                {% for product in products %}
+                    <div class="info-card flex justify-between items-center border-l-4 border-l-blue-500">
+                        <div>
+                            <p class="font-bold">{{ product.name }}</p>
+                            <p class="text-xs text-gray-500">${{ product.price }} | {{ product.get_status_display }}</p>
+                        </div>
+                        <a href="{% url 'merchstore_detail' product.pk %}" class="btn-action dark text-xs">View</a>
+                    </div>
+                {% empty %}
+                    <p class="text-sm italic text-gray-400">No products listed yet.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Events -->
+        <section>
+            <div class="section-label">
+                <h3>Organized Events</h3>
+                <span class="label-aux">{{ events.count }} Events in LocalEvents</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                {% for event in events %}
+                    <div class="info-card flex justify-between items-center border-l-4 border-l-green-500">
+                        <div>
+                            <p class="font-bold">{{ event.title }}</p>
+                            <p class="text-xs text-gray-500">{{ event.start_time|date:"M d" }} | {{ event.status }}</p>
+                        </div>
+                        <a href="{% url 'event_detail' event.pk %}" class="btn-action dark text-xs">View</a>
+                    </div>
+                {% empty %}
+                    <p class="text-sm italic text-gray-400">No events organized yet.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Books -->
+        <section>
+            <div class="section-label">
+                <h3>Book Contributions</h3>
+                <span class="label-aux">{{ books.count }} Books in Book Club</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                {% for book in books %}
+                    <div class="info-card flex justify-between items-center border-l-4 border-l-indigo-500">
+                        <div>
+                            <p class="font-bold">{{ book.title }}</p>
+                            <p class="text-xs text-gray-500">Genre: {{ book.genre }}</p>
+                        </div>
+                        <a href="{% url 'bookclub:book_detail' book.pk %}" class="btn-action dark text-xs">View</a>
+                    </div>
+                {% empty %}
+                    <p class="text-sm italic text-gray-400">No books added yet.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Projects -->
+        <section>
+            <div class="section-label">
+                <h3>DIY Projects</h3>
+                <span class="label-aux">{{ projects.count }} Guides in DIY Projects</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                {% for project in projects %}
+                    <div class="info-card flex justify-between items-center border-l-4 border-l-orange-500">
+                        <div>
+                            <p class="font-bold">{{ project.title }}</p>
+                            <p class="text-xs text-gray-500">Category: {{ project.category }}</p>
+                        </div>
+                        <a href="{% url 'diyprojects:project_detail' project.pk %}" class="btn-action dark text-xs">View</a>
+                    </div>
+                {% empty %}
+                    <p class="text-sm italic text-gray-400">No projects created yet.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Commissions -->
+        <section>
+            <div class="section-label">
+                <h3>Commission Requests</h3>
+                <span class="label-aux">{{ commissions.count }} Requests in Commissions</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                {% for commission in commissions %}
+                    <div class="info-card flex justify-between items-center border-l-4 border-l-red-500">
+                        <div>
+                            <p class="font-bold">{{ commission.title }}</p>
+                            <p class="text-xs text-gray-500">Status: {{ commission.status }}</p>
+                        </div>
+                        <a href="{% url 'request_detail' commission.pk %}" class="btn-action dark text-xs">View</a>
+                    </div>
+                {% empty %}
+                    <p class="text-sm italic text-gray-400">No commissions created yet.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+    </div>
+
+    <footer class="detail-footer border-t border-gray-100 dark:border-gray-800 pt-8 mt-12">
+        <a href="{% url 'home' %}" class="link-back mx-auto">Back to Home</a>
+    </footer>
+</main>
+{% endblock %}

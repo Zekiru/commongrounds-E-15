@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Borrow {{ book.title }}{% endblock %}
+
+{% block content %}
+<main class="detail-container">
+    
+    <header class="detail-header">
+        <h1>Borrow Request</h1>
+        <a href="{% url 'bookclub:book_list' %}" class="link-back">
+            Book Club Library
+        </a>
+    </header>
+
+    <section class="section-label">
+        <h3>{{ book.title }}</h3>
+    </section>
+
+    <div class="info-card mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+            <div class="space-y-1">
+                <p class="text-xs font-bold uppercase tracking-wider text-gray-400">Author</p>
+                <p class="text-gray-900 dark:text-gray-100 font-medium">{{ book.author }}</p>
+            </div>
+            <div class="space-y-1">
+                <p class="text-xs font-bold uppercase tracking-wider text-gray-400">Genre</p>
+                <p class="text-gray-900 dark:text-gray-100">{{ book.genre }}</p>
+            </div>
+            <div class="space-y-1">
+                <p class="text-xs font-bold uppercase tracking-wider text-gray-400">Published</p>
+                <p class="text-gray-900 dark:text-gray-100">{{ book.publication_year }}</p>
+            </div>
+            <div class="col-span-full pt-2 border-t border-gray-50 dark:border-gray-800">
+                <p class="text-xs font-bold uppercase tracking-wider text-gray-400">Synopsis</p>
+                <p class="text-gray-600 dark:text-gray-400 mt-1 leading-relaxed italic">
+                    {{ book.synopsis }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <section class="section-label">
+        <h3>Borrower Information</h3>
+    </section>
+
+    <div class="info-card">
+        <form method="POST" class="django-form-container space-y-6">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label for="id_name" class="block text-sm font-bold text-gray-700 dark:text-gray-300">Your Name</label>
+                    {{ form.name }}
+                </div>
+                <div class="space-y-2">
+                    <label for="id_date_borrowed" class="block text-sm font-bold text-gray-700 dark:text-gray-300">Date Borrowed</label>
+                    <div class="flex gap-2">
+                        {{ form.date_borrowed }}
+                        <button type="submit" name="calculate" class="btn-action dark py-2 px-3 text-xs">
+                            Calc Return
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {% if date_to_return %}
+                <div class="p-4 rounded-lg bg-blue-50 border border-blue-100 dark:bg-blue-900/20 dark:border-blue-800/30 text-blue-800 dark:text-blue-300 text-sm">
+                    <div class="flex items-center gap-2 mb-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="font-bold italic text-xs">Library Policy: 2-Week Lending Period</span>
+                    </div>
+                    <p>Borrowed on: <strong>{{ selected_date|date:"F j, Y" }}</strong></p>
+                    <p class="mt-1 text-base">Required Return: <span class="underline decoration-2 underline-offset-4 decoration-blue-500 font-black">{{ date_to_return|date:"F j, Y" }}</span></p>
+                </div>
+            {% endif %}
+
+            <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    {% if book.available_to_borrow %}
+                        <button type="submit" class="btn-action primary">
+                            Confirm Borrowing
+                        </button>
+                    {% else %}
+                        <button type="button" class="btn-action dark opacity-50 cursor-not-allowed" disabled>
+                            Currently Checked Out
+                        </button>
+                    {% endif %}
+                    <a href="{% url 'bookclub:book_detail' book.pk %}" class="btn-action dark">
+                        Cancel
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <footer class="detail-footer mt-12">
+        <div class="space-y-1 text-gray-400">
+        </div>
+        <a href="{% url 'bookclub:book_list' %}" class="link-back mt-4">Back to Library Collection</a>
+    </footer>
+</main>
+{% endblock %}

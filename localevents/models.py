@@ -22,7 +22,11 @@ class Event(models.Model):
     ]
 
     title = models.CharField(max_length=255)
-    category = models.ForeignKey(EventType, null=True, on_delete=models.SET_NULL)
+    category = models.ForeignKey(
+        EventType,
+        null=True,
+        on_delete=models.SET_NULL
+    )
     organizer = models.ManyToManyField(Profile)
     event_image = models.ImageField(upload_to='images/', null=True, blank=True)
     description = models.TextField()
@@ -30,7 +34,11 @@ class Event(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
     event_capacity = models.PositiveIntegerField()
-    status = models.CharField(max_length=255, choices=STATUS_CHOICES, default='Available')
+    status = models.CharField(
+        max_length=255,
+        choices=STATUS_CHOICES,
+        default='Available'
+    )
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 
@@ -42,7 +50,11 @@ class Event(models.Model):
 
 
 class EventSignup(models.Model):
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='signups')
+    event = models.ForeignKey(
+        Event,
+        on_delete=models.CASCADE,
+        related_name='signups'
+    )
     user_registrant = models.ForeignKey(
         Profile,
         null=True,

@@ -1,35 +1,123 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% load static %}
 
-{% block title %}Book Club Details{% endblock %}
+{% block title %}Book | {{ book.title }}{% endblock %}
 
 {% block content %}
-    <h2>Book Details</h2>
-    <hr>
-    <h2>{{ book.title }}</h2>
-    <h3>Genre</h3>
-    {% if book.genre %}
-    <h4>{{ book.genre.name }}</h4>
-    <p>{{ book.genre.description }}</p>
-    {% else %}
-    <h4>None</h4>
+<main class="detail-container">
+    
+    <header class="detail-header">
+        <h1>Book Details</h1>
+        <a href="{% url 'bookclub:book_list' %}" class="link-back">Back to Library</a>
+    </header>
+
+    <section class="detail-hero">
+        <div class="flex justify-between items-start">
+            <div>
+                <h2>{{ book.title }}</h2>
+                <p>By <span class="font-medium text-gray-900 dark:text-gray-100">{{ book.author }}</span></p>
+            </div>
+            
+            <div class="flex gap-2">
+                {% if user.is_authenticated %}
+                    <form method="POST" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" name="action" value="bookmark" 
+                                class="btn-action {% if user_has_bookmarked %}primary{% else %}dark{% endif %} text-sm">
+                            {% if user_has_bookmarked %}Bookmarked{% else %}Bookmark{% endif %}
+                        </button>
+                    </form>
+                {% endif %}
+
+                {% if user.is_authenticated and user.profile == book.contributor %}
+                    <a href="{% url 'bookclub:book_edit' book.pk %}" class="btn-action dark text-sm">Edit Book</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="mt-6 flex flex-wrap gap-4">
+            <div class="status-pill">
+                <span>Status:</span> 
+                {% if book.available_to_borrow %}
+                    <b class="text-green-600 dark:text-green-400">Available</b>
+                {% else %}
+                    <b class="text-red-600 dark:text-red-400">Checked Out</b>
+                {% endif %}
+            </div>
+            <div class="status-pill">
+                <span>Published:</span> {{ book.publication_year }}
+            </div>
+            <div class="status-pill">
+                <span>Bookmarks:</span> {{ bookmark_count }}
+            </div>
+        </div>
+    </section>
+
+    <article class="detail-body">
+        {{ book.synopsis|linebreaks }}
+    </article>
+
+    <div class="info-card variant-ghost mb-10">
+        <span class="text-[10px] font-bold uppercase text-gray-500 tracking-widest mb-2 block">Genre & Classification</span>
+        {% if book.genre %}
+            <h4 class="text-gray-900 dark:text-white! mb-1">{{ book.genre.name }}</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400">{{ book.genre.description }}</p>
+        {% else %}
+            <h4 class="text-gray-400 italic font-normal">No genre assigned</h4>
+        {% endif %}
+    </div>
+
+    {% if book.available_to_borrow %}
+    <div class="mb-12">
+        <a href="{% url 'bookclub:book_borrow' book.pk %}" class="btn-action primary w-full md:w-auto text-center">
+            Borrow this Book
+        </a>
+    </div>
     {% endif %}
-    <table>
-        <tr>
-            <th>Author</th>
-            <td>{{ book.author }}</td>
-        </tr>
-        <tr>
-            <th>Published</th>
-            <td>{{ book.publication_year }}</td>
-        </tr>
-        <tr>
-            <th>Created</th>
-            <td>{{ book.created_on }}</td>
-        </tr>
-        <tr>
-            <th>Updated</th>
-            <td>{{ book.updated_on }}</td>
-        </tr>
-    </table>
-    <a href="/bookclub/books"class="btn align-right">Back</a>
+
+    <hr class="border-gray-200 dark:border-gray-800 my-8">
+
+    <section class="section-label">
+        <h3>Reviews</h3>
+        <span class="label-aux">{{ reviews|length }} Total</span>
+    </section>
+
+    <div class="info-card mb-8">
+        <h4 class="text-sm! mb-4 text-gray-900 dark:text-white">Write a Review</h4>
+        <form method="POST" class="django-form-container">
+            {% csrf_token %}
+            <input type="text" name="title" placeholder="Review Title" required>
+            <textarea name="comment" placeholder="Write your thoughts about the book..." required></textarea>
+            <button type="submit" class="btn-action dark mt-2">Submit Review</button>
+        </form>
+    </div>
+
+    <div class="grid gap-4">
+        {% for review in reviews %}
+            <div class="info-card">
+                <div class="flex justify-between items-start mb-2">
+                    <h4 class="text-base!">{{ review.title }}</h4>
+                    <span class="text-[10px] uppercase font-bold text-gray-400">
+                        By: {% if review.user_reviewer %}{{ review.user_reviewer.display_name }}{% else %}Anonymous{% endif %}
+                    </span>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400 text-sm italic leading-relaxed">
+                    "{{ review.comment }}"
+                </p>
+            </div>
+        {% empty %}
+            <div class="p-8 text-center border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-2xl">
+                <p class="text-gray-400">No reviews yet. Be the first to share your thoughts!</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <footer class="detail-footer">
+        <div class="space-y-1">
+            <p>Added to Library: {{ book.created_on|date:"F d, Y" }}</p>
+            <p>Last Activity: {{ book.updated_on|timesince }} ago</p>
+        </div>
+        <a href="{% url 'bookclub:book_list' %}" class="link-back">Library Catalog</a>
+    </footer>
+</main>
 {% endblock %}
