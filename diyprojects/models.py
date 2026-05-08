@@ -3,6 +3,8 @@ from django.urls import reverse
 from accounts.models import Profile
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+from commongrounds.storage import CloudinaryStorage
+
 STATUS_CHOICES = [
     ('Backlog', 'Backlog'),
     ('To-Do', 'To-Do'),
@@ -93,7 +95,9 @@ class ProjectReview(models.Model):
 
     comment = models.TextField()
     image = models.ImageField(
-        upload_to='projects/reviews', null=True, blank=True)
+        upload_to='images/',
+        storage=CloudinaryStorage(), 
+        null=True, blank=True)
 
 
 class ProjectRating(models.Model):

@@ -3,6 +3,8 @@ from django.urls import reverse
 from django.core.validators import MinValueValidator
 
 from accounts.models import Profile
+from commongrounds.storage import CloudinaryStorage
+
 
 
 class ProductType(models.Model):
@@ -32,7 +34,8 @@ class Product(models.Model):
         Profile, on_delete=models.CASCADE
     )
     product_image = models.ImageField(
-        upload_to='images/'
+        upload_to='images/',
+        storage=CloudinaryStorage()
     )
     description = models.TextField()
     price = models.DecimalField(
