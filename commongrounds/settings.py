@@ -32,7 +32,11 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+ALLOWED_HOSTS = [
+    os.getenv('RAILWAY_PUBLIC_DOMAIN'),
+    '127.0.0.1',
+    'localhost'
+]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://bubbly-emotion-production.up.railway.app",
@@ -104,10 +108,10 @@ WSGI_APPLICATION = 'commongrounds.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=os.getenv('DATABASE_URL'),
+        conn_max_age=600,
+    )
 }
 
 # Password validation
@@ -146,6 +150,12 @@ cloudinary.config(
 )
 
 MEDIA_URL = '/media/'
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 LOGIN_URL = '/accounts/login'
 LOGIN_REDIRECT_URL = 'home'
