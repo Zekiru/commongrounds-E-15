@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from accounts.models import Profile
 from django.core.validators import MinValueValidator, MaxValueValidator
+from cloudinary.models import CloudinaryField
 
 STATUS_CHOICES = [
     ('Backlog', 'Backlog'),
@@ -92,8 +93,12 @@ class ProjectReview(models.Model):
     )
 
     comment = models.TextField()
-    image = models.ImageField(
-        upload_to='projects/reviews', null=True, blank=True)
+    image = CloudinaryField(
+        'image',
+        folder='project_reviews/',
+        null=True,
+        blank=True
+    )
 
 
 class ProjectRating(models.Model):

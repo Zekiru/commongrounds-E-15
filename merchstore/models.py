@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.core.validators import MinValueValidator
 
 from accounts.models import Profile
+from cloudinary.models import CloudinaryField
 
 
 class ProductType(models.Model):
@@ -31,8 +32,9 @@ class Product(models.Model):
     owner = models.ForeignKey(
         Profile, on_delete=models.CASCADE
     )
-    product_image = models.ImageField(
-        upload_to='images/'
+    product_image = CloudinaryField(
+        'image',
+        folder='products/'
     )
     description = models.TextField()
     price = models.DecimalField(

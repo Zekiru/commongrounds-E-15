@@ -1,5 +1,6 @@
 from django.db import models
 from accounts.models import Profile
+from cloudinary.models import CloudinaryField
 
 
 class EventType(models.Model):
@@ -28,7 +29,12 @@ class Event(models.Model):
         on_delete=models.SET_NULL
     )
     organizer = models.ManyToManyField(Profile)
-    event_image = models.ImageField(upload_to='images/', null=True, blank=True)
+    event_image = CloudinaryField(
+        'image',
+        folder='events/',
+        null=True,
+        blank=True
+    )
     description = models.TextField()
     location = models.CharField(max_length=255)
     start_time = models.DateTimeField()
