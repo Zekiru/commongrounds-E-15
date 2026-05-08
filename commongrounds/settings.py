@@ -42,6 +42,8 @@ CSRF_TRUSTED_ORIGINS = [
     "https://bubbly-emotion-production.up.railway.app",
 ]
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
@@ -71,6 +73,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -82,6 +85,7 @@ MIDDLEWARE = [
 if DEBUG:
     INSTALLED_APPS += ["django_browser_reload"]
     MIDDLEWARE += ["django_browser_reload.middleware.BrowserReloadMiddleware"]
+
 
 ROOT_URLCONF = 'commongrounds.urls'
 
