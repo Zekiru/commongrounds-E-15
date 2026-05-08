@@ -52,7 +52,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cloudinary_storage',
     'cloudinary',
     'tailwind',
     'theme',
@@ -149,7 +148,7 @@ if DEBUG:
 else:
     # Production (Railway)
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    DEFAULT_FILE_STORAGE = 'commongrounds.storage.MediaCloudinaryStorage'
     
     cloudinary.config(
     cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),

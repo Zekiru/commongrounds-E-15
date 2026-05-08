@@ -2,7 +2,7 @@ import cloudinary.uploader
 import cloudinary
 from django.core.files.storage import Storage
 
-print("CloudinarySTorage loaded!")
+print("CloudinaryStorage loaded!")
 
 class CloudinaryStorage(Storage):
     def deconstruct(self):
