@@ -29,9 +29,15 @@ class Event(models.Model):
         on_delete=models.SET_NULL
     )
     organizer = models.ManyToManyField(Profile)
-    event_image = models.ImageField(upload_to='images/', 
+
+    event_image = models.ImageField(
+        upload_to='images/',
         storage=CloudinaryStorage(),
-        null=True, blank=True)
+        null=True,
+        blank=True,
+        max_length=500
+    )
+
     description = models.TextField()
     location = models.CharField(max_length=255)
     start_time = models.DateTimeField()
