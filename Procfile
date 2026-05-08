@@ -1,2 +1,1 @@
-release: python manage.py migrate && python manage.py collectstatic --noinput
-web: gunicorn commongrounds.wsgi --log-file -
+web: python manage.py migrate && python manage.py collectstatic --noinput && gunicorn commongrounds.wsgi --log-file -
