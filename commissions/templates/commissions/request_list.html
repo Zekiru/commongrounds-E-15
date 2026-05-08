@@ -1,21 +1,132 @@
 {% extends "base.html" %}
 
-{% block title %}Commission Requests{% endblock %}
+{% block title %}Commissions{% endblock %}
 
 {% block content %}
-    <h2>List of Commission Requests</h2>
-    <div class="list-wrapper">
-    {% for request in requests %}
-        <div class="list-item">
-            <h3>{{ request.title }}</h3>
-            <p><i>{{ request.commission_type }}</i></p>
-            <a href="{{ request.get_absolute_url }}"
-            class="btn align-left">
-                View Request
-            </a>
+<div class="flex items-center justify-between flex-wrap gap-4 my-6">
+    <h2 class="text-2xl font-light italic tracking-tight text-gray-900 dark:text-white">Commissions</h2>
+    <a href="{% url 'home' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors">
+        Back to Home
+    </a>
+</div>
+
+{% if user.is_authenticated and user.profile.role == 'CM' %}
+<div class="flex justify-end mb-4">
+    <a href="{% url 'request_create' %}" 
+       class="px-4 py-2 font-semibold text-white bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-400 rounded-lg transition-all active:scale-95 cursor-pointer shadow-sm">
+        + Create Request
+    </a>
+</div>
+{% endif %}
+
+<div class="space-y-12">
+    {% if requests.created %}
+    <section>
+        <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-1 border-gray-200 dark:border-gray-800">
+            Commissions You Created
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for commission in requests.created %}
+                <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start gap-2 mb-2">
+                            <h4 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">
+                                {{ commission.title }}
+                            </h4>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 ring-1 ring-blue-700/10 dark:bg-blue-900/30 dark:text-blue-400">
+                                {{ commission.get_status }}
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                            Hiring Status: <span class="font-medium text-gray-700 dark:text-gray-300">{{ commission.get_jobs_status }}</span>
+                        </p>
+                    </div>
+                    <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
+                        <a href="{% url 'request_update' commission.id %}" class="text-sm font-medium text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400">Manage</a>
+                        <a href="{{ commission.get_absolute_url }}" class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 rounded-lg transition-all active:scale-95">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
-    {% empty %}
-        <p>No requests available.</p>
-    {% endfor %}
+    </section>
+    {% endif %}
+
+    {% if requests.applied %}
+    <section>
+        <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-1 border-gray-200 dark:border-gray-800">
+            Commissions You Applied For
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for commission in requests.applied %}
+                <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between border-l-4 border-l-blue-500">
+                    <div>
+                        <h4 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white mb-2">
+                            {{ commission.title }}
+                        </h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                            Maker: <span class="font-medium text-gray-700 dark:text-gray-300">{{ commission.maker.display_name }}</span>
+                        </p>
+                    </div>
+                    <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
+                        <span class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase">Application Active</span>
+                        <a href="{{ commission.get_absolute_url }}" class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 rounded-lg transition-all active:scale-95">
+                            View Status
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if requests.all %}
+    <section>
+        <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-1 border-gray-200 dark:border-gray-800">
+            Explore All Commissions
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for commission in requests.all %}
+                <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start gap-2 mb-2">
+                            <h4 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">
+                                {{ commission.title }}
+                            </h4>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold 
+                                {% if commission.status == 0 %}bg-green-50 text-green-700 ring-green-700/10
+                                {% else %}bg-gray-50 text-gray-700 ring-gray-700/10{% endif %} ring-1">
+                                {{ commission.get_status }}
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">
+                            {{ commission.description }}
+                        </p>
+                        <div class="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                            <span>Required: {{ commission.people_required }}</span>
+                            <span>•</span>
+                            <span>Hiring: {{ commission.get_jobs_status }}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
+                        <span class="text-sm italic text-gray-500 dark:text-gray-400">
+                            {{ commission.type.name|default:"General" }}
+                        </span>
+                        <a href="{{ commission.get_absolute_url }}" class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 rounded-lg transition-all active:scale-95">
+                            View Request
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if not requests.created and not requests.applied and not requests.all %}
+    <div class="text-center py-20 bg-gray-50 dark:bg-gray-900/50 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-800">
+        <p class="text-gray-500 dark:text-gray-400">No commissions available at this time.</p>
     </div>
+    {% endif %}
+</div>
 {% endblock %}

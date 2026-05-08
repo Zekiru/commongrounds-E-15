@@ -1,22 +1,146 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-{% block title %}Book Club Library{% endblock %}
+{% block title %}Book Club{% endblock %}
 
 {% block content %}
-    <h2>Book Club Library</h2>
-    <div class="list-wrapper">
-    {% for book in books %}
-        <div class="list-item">
-            <h3>{{ book.title }}</h3>
-            <p>By <b>{{ book.author }}</b> ({{ book.publication_year }})</p>
-            <p><i>{{ book.genre.name }}</i></p>
-            <a href="{% url 'bookclub:book_detail' book.pk %}"
-            class="btn align-left">
-                View Book
-            </a>
+<div class="flex items-center justify-between flex-wrap gap-4 my-6">
+    <h2 class="text-2xl font-light italic tracking-tight text-gray-900 dark:text-white">Book Club</h2>
+    <a href="{% url 'home' %}" class="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors">
+        Back to Home
+    </a>
+</div>
+
+{% if user.is_authenticated and user.profile.role == 'BC' %}
+<div class="flex justify-end mb-4">
+    <a href="{% url 'bookclub:book_add' %}" 
+       class="px-4 py-2 font-semibold text-white bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-400 rounded-lg transition-all active:scale-95 cursor-pointer shadow-sm">
+        + Add New Book
+    </a>
+</div>
+{% endif %}
+
+<div class="space-y-12">
+    {% if user.is_authenticated %}
+        {% if books_contributed %}
+        <section>
+            <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-1 border-gray-200 dark:border-gray-800">
+                Books You Contributed
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for book in books_contributed %}
+                    <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start gap-2 mb-2">
+                                <h4 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">
+                                    {{ book.title }}
+                                </h4>
+                                {% if book.available_to_borrow %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-50 text-green-700 ring-1 ring-green-700/10 dark:bg-green-900/30 dark:text-green-400 dark:ring-green-400/20">
+                                        Available
+                                    </span>
+                                {% else %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-red-700 ring-1 ring-red-700/10 dark:bg-red-900/30 dark:text-red-400 dark:ring-red-400/20">
+                                        On Loan
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                By <span class="font-medium text-gray-700 dark:text-gray-300">{{ book.author }}</span> ({{ book.publication_year }})
+                            </p>
+                        </div>
+                        <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
+                            <span class="text-sm italic text-gray-500 dark:text-gray-400">
+                                {{ book.genre.name|default:"General" }}
+                            </span>
+                            <a href="{% url 'bookclub:book_detail' book.id %}" class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 rounded-lg transition-all active:scale-95">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        {% if books_bookmarked %}
+        <section>
+            <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-1 border-gray-200 dark:border-gray-800">
+                Your Bookmarks
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for book in books_bookmarked %}
+                    <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start gap-2 mb-2">
+                                <h4 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">
+                                    {{ book.title }}
+                                </h4>
+                                {% if book.available_to_borrow %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-50 text-green-700 ring-1 ring-green-700/10">Available</span>
+                                {% else %}
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-red-700 ring-1 ring-red-700/10">Borrowed</span>
+                                {% endif %}
+                            </div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                By <span class="font-medium text-gray-700 dark:text-gray-300">{{ book.author }}</span> ({{ book.publication_year }})
+                            </p>
+                        </div>
+                        <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
+                            <span class="text-sm italic text-gray-500 dark:text-gray-400">
+                                {{ book.genre.name|default:"General" }}
+                            </span>
+                            <a href="{% url 'bookclub:book_detail' book.id %}" class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 rounded-lg transition-all active:scale-95">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+    {% endif %}
+
+    <section>
+        <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 border-b pb-1 border-gray-200 dark:border-gray-800">
+            Discover Library
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for book in all_books %}
+                <div class="p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start gap-2 mb-2">
+                            <h4 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white leading-tight">
+                                {{ book.title }}
+                            </h4>
+                            {% if book.available_to_borrow %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-50 text-green-700 ring-1 ring-green-700/10 dark:bg-green-900/30 dark:text-green-400 dark:ring-green-400/20">
+                                    Available
+                                </span>
+                            {% else %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-50 text-red-700 ring-1 ring-red-700/10 dark:bg-red-900/30 dark:text-red-400 dark:ring-red-400/20">
+                                    Borrowed
+                                </span>
+                            {% endif %}
+                        </div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                            By <span class="font-medium text-gray-700 dark:text-gray-300">{{ book.author }}</span> ({{ book.publication_year }})
+                        </p>
+                    </div>
+                    <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
+                        <span class="text-sm italic text-gray-500 dark:text-gray-400">
+                            {{ book.genre.name|default:"General" }}
+                        </span>
+                        <a href="{% url 'bookclub:book_detail' book.id %}" class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 rounded-lg transition-all active:scale-95">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-span-full text-center py-12 bg-gray-50 dark:bg-gray-900/50 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-800">
+                    <p class="text-gray-500 dark:text-gray-400">No books found in the library.</p>
+                </div>
+            {% endfor %}
         </div>
-    {% empty %}
-        <p>No books available.</p>
-    {% endfor %}
-    </div>
+    </section>
+</div>
 {% endblock %}

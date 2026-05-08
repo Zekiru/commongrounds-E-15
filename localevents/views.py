@@ -20,7 +20,9 @@ def event_list(request):
     if request.user.is_authenticated:
         profile = request.user.profile
         created_events = Event.objects.filter(organizer=profile)
-        signed_up_events = Event.objects.filter(signups__user_registrant=profile)
+        signed_up_events = Event.objects.filter(
+            signups__user_registrant=profile
+        )
         all_events = Event.objects.exclude(organizer=profile).exclude(
             signups__user_registrant=profile
         )
@@ -41,7 +43,7 @@ def event_detail(request, event_id):
         raise Http404("Event does not exist")
 
     signups = EventSignup.objects.filter(event=event)
-    signup_count = len(signups)
+    signup_count = signups.count()
     is_full = signup_count >= event.event_capacity
 
     is_organizer = False
@@ -85,18 +87,15 @@ class EventUpdateView(LoginRequiredMixin, RoleRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         self.object = form.save()
-
-        signups = EventSignup.objects.filter(event=self.object)
-        signup_count = len(signups)
-
-        if signup_count >= self.object.event_capacity:
-            self.object.status = 'Full'
-        else:
-            self.object.status = 'Available'
-
-        self.object.save()
-
+        self.update_event_status(self.object)
         return redirect('event_detail', event_id=self.object.id)
+
+    def update_event_status(self, event):
+        if event.signups.count() >= event.event_capacity:
+            event.status = 'Full'
+        else:
+            event.status = 'Available'
+        event.save()
 
 
 class BaseSignupView(View):
@@ -116,23 +115,27 @@ class BaseSignupView(View):
 
         if signup is None:
             form = EventSignupForm(request.POST)
-            context = {
-                'event': event,
-                'form': form,
-            }
+            context = {'event': event, 'form': form}
             return render(request, 'event_signup.html', context)
 
+        self.update_event_status(event)
         return redirect(self.get_redirect_url(event))
 
     def check_capacity(self, event):
-        signups = EventSignup.objects.filter(event=event)
-        return len(signups) < event.event_capacity
+        return event.signups.count() < event.event_capacity
 
     def check_ownership(self, event, user):
         if user.is_authenticated:
             if user.profile in event.organizer.all():
                 return False
         return True
+
+    def update_event_status(self, event):
+        if event.signups.count() >= event.event_capacity:
+            event.status = 'Full'
+        else:
+            event.status = 'Available'
+        event.save()
 
     def create_signup(self, event, user):
         return None
@@ -149,7 +152,11 @@ class EventSignupView(BaseSignupView):
             raise Http404("Event does not exist")
 
         if request.user.is_authenticated:
-            return redirect('event_detail', event_id=event.id)
+            if EventSignup.objects.filter(
+                event=event,
+                user_registrant=request.user.profile
+            ).exists():
+                return redirect('event_detail', event_id=event.id)
 
         form = EventSignupForm()
         context = {
@@ -160,22 +167,13 @@ class EventSignupView(BaseSignupView):
 
     def create_signup(self, event, user):
         if user.is_authenticated:
-            existing_signups = EventSignup.objects.filter(
+            signup, created = EventSignup.objects.get_or_create(
                 event=event,
                 user_registrant=user.profile
             )
-
-            if len(existing_signups) == 0:
-                signup = EventSignup()
-                signup.event = event
-                signup.user_registrant = user.profile
-                signup.save()
-                return signup
-
-            return existing_signups[0]
+            return signup
 
         form = EventSignupForm(self.request.POST)
-
         if form.is_valid():
             signup = form.save(commit=False)
             signup.event = event
@@ -183,6 +181,3 @@ class EventSignupView(BaseSignupView):
             return signup
 
         return None
-
-    def get_redirect_url(self, event):
-        return reverse('event_detail', args=[event.id])

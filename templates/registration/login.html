@@ -1,16 +1,32 @@
-{% extends 'base.html' %}
-
-{% block title %}Login{% endblock %}
+{% extends "base.html" %}
 
 {% block content %}
-    <div class="form-wrapper">
-        <h2>Login</h2>
-        <form class="form-group" method="POST">
+<div class="flex flex-col items-center justify-center min-h-[70vh] p-4">
+    
+    <div class="w-full max-w-sm bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md border border-gray-100 dark:border-gray-700">
+        
+        <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
+
+        <form method="POST" class="django-form-container">
             {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Login</button>
+            
+            <div class="mb-4 [&_nonfield]:text-red-800">
+                {{ form.as_p }}
+            </div>
+
+            <button type="submit" 
+                    class="w-full py-2.5 px-4 font-bold text-white bg-blue-600 rounded-lg
+                           transition-all duration-200 active:scale-95 hover:bg-blue-700 cursor-pointer">
+                Sign In
+            </button>
         </form>
-        <br>
-        <a href="{% url 'password_reset' %}">Forgot Password?</a>
+
+        <div class="mt-6 text-center">
+            <a href="{% url 'password_reset' %}" class="text-sm text-blue-500 hover:underline">
+                Forgot Password?
+            </a>
+        </div>
     </div>
+
+</div>
 {% endblock %}

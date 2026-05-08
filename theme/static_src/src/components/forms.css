@@ -1,0 +1,77 @@
+@layer components {
+  .django-form-container {
+    color: var(--color-gray-800);
+
+    @variant dark {
+      color: var(--color-gray-200);
+    }
+
+    /* Target standard inputs, selects, and textareas */
+    & :is(input:not([type="checkbox"]), select, textarea) {
+      @apply w-full p-2.5 mt-1 mb-3 transition-all duration-150;
+      border: 2px solid var(--color-gray-300);
+      border-radius: var(--radius-lg);
+      background-color: var(--color-white);
+      color: var(--color-gray-900);
+
+      @variant dark {
+        border-color: var(--color-gray-600);
+        background-color: var(--color-gray-800);
+        color: var(--color-gray-50);
+      }
+
+      &:focus {
+        @apply outline-none;
+        border-color: var(--color-blue-500);
+      }
+
+      &:disabled {
+        @apply cursor-not-allowed opacity-70 shadow-none;
+        background-color: var(--color-gray-100);
+        border-color: var(--color-gray-200);
+        color: var(--color-gray-400);
+      }
+    }
+
+    /* Specific Textarea handling */
+    & textarea {
+      @apply resize-y min-h-20 self-start;
+    }
+
+    /* Checkbox Styling - Cleaned up !important usage */
+    & input[type="checkbox"] {
+      @apply w-5 h-5 p-0 mr-2 inline-block align-middle cursor-pointer;
+      border: 2px solid var(--color-gray-600);
+      accent-color: var(--color-blue-600);
+
+      @variant dark {
+        border-color: var(--color-gray-400);
+      }
+    }
+
+    /* Django Error List Handling */
+    & .errorlist {
+      @apply list-none p-0 mt-1 mb-3 text-sm font-medium text-red-600;
+
+      @variant dark {
+        color: var(--color-red-400);
+      }
+
+      & li { @apply mb-0.5; }
+    }
+
+    /* Error State for Input Fields */
+    & .error :is(input, select, textarea) {
+      border-color: var(--color-red-500);
+      background-color: var(--color-red-50);
+
+      @variant dark {
+        background-color: color-mix(in srgb, var(--color-red-950), transparent 80%);
+        border-color: var(--color-red-400);
+      }
+    }
+
+    /* Container List spacing */
+    & ul { @apply my-6; }
+  }
+}

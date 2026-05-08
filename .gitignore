@@ -30,4 +30,4 @@ local_settings.py
 .env
 db.sqlite3
 media/
-static_collected/
+staticfiles/

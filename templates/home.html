@@ -3,34 +3,35 @@
 {% block title %}Common Grounds{% endblock %}
 
 {% block content %}
-    <h2>Directory</h2>
-    <div class="list-wrapper">
-        <div class="list-item">
-            <a href="/merchstore/items"
+    <h2 class="text-[2rem] font-bold mx-auto my-5">Directory</h2>
+    <hr>
+    <div class="text-[1.2rem] flex flex-col gap-10 font-medium mx-auto my-10 items-center [&_a]:hover:underline">
+        <div class="">
+            <a href="{% url 'merchstore_list' %}"
             class="directory-btn">
                 Merchandise Store
             </a>
         </div>
-        <div class="list-item">
-            <a href="/localevents/events"
+        <div class="">
+            <a href="{% url 'event_list' %}"
             class="directory-btn">
                 Local Events
             </a>
         </div>
-        <div class="list-item">
-            <a href="/bookclub/books"
+        <div class="">
+            <a href="{% url 'bookclub:book_list' %}"
             class="directory-btn">
                 Book Club
             </a>
         </div>
-        <div class="list-item">
-            <a href="/diyprojects/projects"
+        <div class="">
+            <a href="{% url 'diyprojects:project_list' %}"
             class="directory-btn">
                 DIY Projects
             </a>
         </div>
-        <div class="list-item">
-            <a href="/commissions/requests"
+        <div class="">
+            <a href="{% url 'request_list' %}"
             class="directory-btn">
                 Commission Requests
             </a>

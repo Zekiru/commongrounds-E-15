@@ -1,31 +1,47 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    {% if object %}Edit Event | {{ object.title }}{% else %}Create New Event{% endif %}
+{% endblock %}
 
 {% block content %}
-<div style="max-width: 800px; margin: 0 auto; padding: 40px 60px;">
+<main class="detail-container">
+    
+    <header class="detail-header">
+        <h1>
+            {% if object %}Edit Event{% else %}Create Event{% endif %}
+        </h1>
+        <a href="{% url 'event_list' %}" class="link-back">Back to Events</a>
+    </header>
 
-    <div style="text-align: center; margin-bottom: 35px;">
-        <h2 style="font-weight: normal; color: #1e90ff; letter-spacing: 1px;">
-            EVENT FORM
-        </h2>
+    <section class="section-label">
+        <h3>Event Specifications</h3>
+    </section>
+
+    <div class="info-card">
+        <form method="POST" enctype="multipart/form-data" class="django-form-container">
+            {% csrf_token %}
+            
+            {{ form.as_p }}
+
+            <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex flex-col md:flex-row items-center gap-4">
+                <button type="submit" class="btn-action primary w-full md:w-auto">
+                    {% if object %}Update Event Details{% else %}Create Event{% endif %}
+                </button>
+                
+                <a href="{% if object %}{% url 'event_detail' object.id %}{% else %}{% url 'event_list' %}{% endif %}" 
+                   class="text-sm text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors">
+                    Cancel and Exit
+                </a>
+            </div>
+        </form>
     </div>
 
-    <hr>
-
-    <form method="POST" enctype="multipart/form-data" style="margin-top: 35px;">
-        {% csrf_token %}
-        {{ form.as_p }}
-
-        <div style="text-align: center; margin-top: 30px;">
-            <button type="submit"
-                style="background-color: #3498db; color: white; padding: 12px 35px; border: none; border-radius: 4px;">
-                Save Event
-            </button>
+    <footer class="detail-footer">
+        <div class="space-y-1">
         </div>
-    </form>
-
-    <p style="margin-top: 30px;">
-        <a href="{% url 'event_list' %}">Back to Events</a>
-    </p>
-
-</div>
+        <a href="{% url 'event_list' %}" class="link-back">Return to Events</a>
+    </footer>
+</main>
 {% endblock %}

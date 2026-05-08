@@ -1,33 +1,118 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Commission Request Details{% endblock %}
+{% block title %}Commission | {{ request.title }}{% endblock %}
 
 {% block content %}
-    <h2>Commission Request Details</h2>
-    <hr>
-    <h2>{{ request.title }}</h2>
-    <p>{{ request.description }}</p>
-    <br>
-    <h3>Type</h3>
-    {% if request.commission_type %}
-    <h4>{{ request.commission_type }}</h4>
-    <p>{{ request.commission_type.description }}</p>
-    {% else %}
-    <h4>None</h4>
-    {% endif %}
-    <table>
-        <tr>
-            <th>People Required</th>
-            <td>{{ request.people_required }}</td>
-        </tr>
-        <tr>
-            <th>Created On</th>
-            <td>{{ request.created_on }}</td>
-        </tr>
-        <tr>
-            <th>Updated On</th>
-            <td>{{ request.updated_on }}</td>
-        </tr>
-    </table>
-    <a href="/commissions/requests" class="btn align-right">Back</a>
+<main class="detail-container">
+    
+    <header class="detail-header">
+        <h1>Commission Details</h1>
+        <a href="{% url 'request_list' %}" class="link-back">Back to Requests</a>
+    </header>
+
+    <section class="detail-hero">
+        <div class="flex justify-between items-start">
+            <div>
+                <h2>{{ request.title }}</h2>
+                <p>By <span class="font-medium text-gray-900 dark:text-gray-100">{{ request.maker.display_name }}</span></p>
+            </div>
+            {% if is_maker %}
+                <a href="{% url 'request_update' pk=request.pk %}" class="btn-action primary">Update Request</a>
+            {% endif %}
+        </div>
+        
+        <div class="mt-6 flex flex-wrap gap-4">
+            <div class="status-pill"><span>Status:</span> {{ summary.status }}</div>
+            {% if request.status == 0 %}
+                <div class="status-pill">
+                    <span>Openings:</span> {{ summary.open_manpower }} / {{ summary.total_manpower }}
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <article class="detail-body">
+        {{ request.description|linebreaks }}
+    </article>
+
+    <div class="info-card variant-ghost mb-10">
+        <span class="text-[10px] font-bold uppercase text-gray-500 tracking-widest mb-2 block">Commission Type</span>
+        {% if request.type %}
+            <h4 class="text-gray-900 dark:text-white! mb-1">{{ request.type.name }}</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-400">{{ request.type.description }}</p>
+        {% else %}
+            <h4 class="text-gray-400 italic font-normal">No specific type assigned</h4>
+        {% endif %}
+    </div>
+
+    <hr class="border-gray-200 dark:border-gray-800 my-8">
+
+    <div class="section-label">
+        <h3>Job List</h3>
+        <span class="label-aux">Hiring Status: {{ request.get_jobs_status }}</span>
+    </div>
+
+    <div class="grid gap-4">
+        {% for category, queryset in jobs.items %}
+            {% for job in queryset %}
+                <div class="info-card">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                        
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-3">
+                                <h4>{{ job.role }}</h4>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase border 
+                                    {% if job.status == 0 %}
+                                        border-green-200 text-green-600 bg-green-50 dark:bg-green-900/20 dark:border-green-800
+                                    {% else %}
+                                        border-gray-200 text-gray-500 bg-gray-50 dark:bg-gray-700 dark:border-gray-600
+                                    {% endif %}">
+                                    {{ job.get_status }}
+                                </span>
+                            </div>
+                            <p class="text-sm text-gray-500">
+                                Slots: <b class="text-gray-900 dark:text-gray-200">{{ job.opening_count }} / {{ job.manpower_required }}</b>
+                            </p>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-4">
+                            {% if is_maker %}
+                                <div class="flex border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden text-xs bg-gray-50 dark:bg-gray-900">
+                                    <div class="px-3 py-1 border-r border-gray-200 dark:border-gray-700 text-center">
+                                        <div class="font-bold text-blue-500">{{ job.app_counts.pending }}</div>
+                                        <div class="text-[9px] uppercase tracking-tighter text-gray-500">Pending</div>
+                                    </div>
+                                    <div class="px-3 py-1 text-center">
+                                        <div class="font-bold text-green-500">{{ job.app_counts.accepted }}</div>
+                                        <div class="text-[9px] uppercase tracking-tighter text-gray-500">Filled</div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'job_detail' pk=job.pk %}" class="btn-action primary text-sm">Manage</a>
+                            
+                            {% elif category == 'applied' %}
+                                <div class="status-pill"><span>Application:</span> {{ job.user_status }}</div>
+                            
+                            {% elif job.status == 0 and user.is_authenticated %}
+                                <form method="POST" action="">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="job_id" value="{{ job.id }}">
+                                    <button type="submit" class="btn-action dark">Apply for Role</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+    <footer class="detail-footer">
+        <div class="space-y-1">
+            <p>Created: {{ request.created_on|date:"h:i A | d M Y" }}</p>
+            <p>Last Updated: {{ request.updated_on|date:"h:i A | d M Y" }}</p>
+        </div>
+        <a href="{% url 'request_list' %}" class="link-back">Back to Requests</a>
+    </footer>
+</main>
 {% endblock %}
