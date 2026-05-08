@@ -12,7 +12,8 @@
         <h1>
             {% if object %}Update Request{% else %}Create Commission Request{% endif %}
         </h1>
-        <a href="{% if object %}{% url 'request_detail' object.pk %}{% else %}{% url 'request_list' %}{% endif %}" 
+        <a href="{% if object and object.pk %}{% url 'request_detail' object.pk %}{% else %}{% url 'request_list' %}{% endif %}" 
+        
            class="link-back">
             Cancel and Return
         </a>
