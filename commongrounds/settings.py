@@ -45,7 +45,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 TAILWIND_APP_NAME = 'theme'
 
 INSTALLED_APPS = [
-    'cloudinary_storage',
+    # 'cloudinary_storage',  # debug purposes
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -136,7 +136,7 @@ AUTH_PASSWORD_VALIDATORS = [
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
-    os.path.join(BASE_DIR, 'theme', 'static', 'css', 'dist'),
+    os.path.join(BASE_DIR, 'theme', 'static'),
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
