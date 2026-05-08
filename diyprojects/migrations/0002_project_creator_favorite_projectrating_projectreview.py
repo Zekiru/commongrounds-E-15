@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('comment', models.TextField()),
-                ('image', models.ImageField(blank=True, null=True, upload_to='projects/reviews')),
+                ('image', models.ImageField(blank=True, null=True, upload_to='images/')),
                 ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reviews', to='diyprojects.project')),
                 ('reviewer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reviews_written', to='accounts.profile')),
             ],

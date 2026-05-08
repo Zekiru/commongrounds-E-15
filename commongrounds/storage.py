@@ -5,6 +5,9 @@ from django.core.files.storage import Storage
 print("CloudinarySTorage loaded!")
 
 class CloudinaryStorage(Storage):
+    def deconstruct(self):
+        return ('commongrounds.storage.CloudinaryStorage', [], {})
+    
     def _save(self, name, content):
         result = cloudinary.uploader.upload(
             content,
